@@ -12,21 +12,21 @@ const Portfolio = () => {
         title: 'Landslide Susceptibility Mapping',
         category: 'Undergraduate Thesis',
         image: '/assets/images/latest-portfolio/LandslideSusceptibilityMap.png',
-        link: '/Portfolio/Undergraduate Thesis.html'
+        link: '/Portfolio/UndergraduateThesis'
       },
       {
         id: 2,
         title: 'UPD Cartography',
         category: 'Public Webmap',
         image: '/assets/images/latest-portfolio/UPDCr.png',
-        link: '/Portfolio/UPD CRtography.html'
+        link: '/Portfolio/UPDCRtography'
       },
       {
         id: 3,
         title: 'EleksyonPH',
         category: 'Election Map',
         image: '/assets/images/latest-portfolio/eleksyon.png',
-        link: '/Portfolio/EleksyonPH.html'
+        link: '/Portfolio/EleksyonPH'
       }
     ],
     'nav-branding': [
@@ -35,42 +35,42 @@ const Portfolio = () => {
         title: 'OSP Map Demo',
         category: 'Demo Web Application',
         image: '/assets/images/latest-portfolio/OSPMapDemo.png',
-        link: '/Portfolio/OSPMapDemo.html'
+        link: '/Portfolio/OSPMapDemo'
       },
       {
         id: 2,
         title: 'Wedding Planner',
         category: 'Web Development',
         image: '/assets/images/latest-portfolio/wed.png',
-        link: '/Portfolio/WeddingPlanner.html'
+        link: '/Portfolio/WeddingPlanner'
       },
       {
         id: 3,
         title: 'Aera',
         category: 'Web Application',
         image: '/assets/images/latest-portfolio/Aera.png',
-        link: '/Portfolio/Aera.html'
+        link: '/Portfolio/Aera'
       },
       {
         id: 4,
         title: 'AeraLink',
         category: 'Web Application',
         image: '/assets/images/latest-portfolio/AeraLink.png',
-        link: '/Portfolio/AeraLink.html'
+        link: '/Portfolio/AeraLink'
       },
       {
         id: 5,
         title: "Joe's Commercial Cleaning",
         category: 'Web Development',
         image: '/assets/images/latest-portfolio/joes.png',
-        link: '/Portfolio/JoesCommercialCleaning.html'
+        link: '/Portfolio/JoesCommercialCleaning'
       },
       {
         id: 6,
         title: 'JJ Spotless',
         category: 'Web Development',
         image: '/assets/images/latest-portfolio/jj.png',
-        link: '/Portfolio/JJSpotless.html'
+        link: '/Portfolio/JJSpotless'
       }
     ],
     'nav-design': [
@@ -79,7 +79,7 @@ const Portfolio = () => {
         title: 'Title Plotter PH',
         category: 'Tools',
         image: '/assets/images/latest-portfolio/tpph.png',
-        link: '/Tools/titleplotterph.html'
+        link: '/Tools/titleplotterph'
       }
     ],
     'nav-content-writing': [],
@@ -89,14 +89,14 @@ const Portfolio = () => {
         title: 'Aera Dashboard',
         category: 'Corporate Project',
         image: '/assets/images/latest-portfolio/Dash.jpg',
-        link: '/Portfolio/AeraDashboard.html'
+        link: '/Portfolio/AeraDashboard'
       },
       {
         id: 2,
         title: 'Ayala Dashboard',
         category: 'Corporate Project',
         image: '/assets/images/latest-portfolio/Dash1.jpg',
-        link: '/Portfolio/AyalaDashboard.html'
+        link: '/Portfolio/AyalaDashboard'
       }
     ]
   }
