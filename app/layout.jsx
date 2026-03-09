@@ -1,5 +1,4 @@
 import './globals.css'
-import CustomCursor from './components/CustomCursor'
 import ScrollToTop from './components/ScrollToTop'
 import ChatWidget from './components/ChatWidget'
 import ScriptLoader from './components/ScriptLoader'
@@ -16,7 +15,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <CustomCursor />
         {children}
         <ScrollToTop />
         <ChatWidget />
