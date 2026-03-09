@@ -1,94 +1,128 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
+
+const MAX_PARTICLES = 15
+const PARTICLE_LIFETIME = 600
+const SMOKE_INTERVAL = 50
 
 const CustomCursor = () => {
   const cursorRef = useRef(null)
+  const particleCountRef = useRef(0)
+  const rafIdRef = useRef(null)
+  const pendingMouseRef = useRef(null)
+  const isHoveringLinkRef = useRef(false)
+  const smokeIntervalRef = useRef(null)
+
+  const createParticle = useCallback((x, y, isLink) => {
+    if (particleCountRef.current >= MAX_PARTICLES) return
+
+    const particle = document.createElement('div')
+    particle.className = 'cursor-particle'
+    const size = isLink ? 6 : 8
+    const offset = size / 2
+    particle.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${x - offset}px;
+      top: ${y - offset}px;
+      background: ${isLink
+        ? 'radial-gradient(circle, rgba(255,255,255,0.6) 20%, rgba(0,255,255,0.3) 100%)'
+        : 'radial-gradient(circle, rgba(255,100,200,0.4) 20%, rgba(255,50,150,0.2) 100%)'};
+    `
+    document.body.appendChild(particle)
+    particleCountRef.current++
+
+    setTimeout(() => {
+      particle.remove()
+      particleCountRef.current--
+    }, PARTICLE_LIFETIME)
+  }, [])
+
+  const createSmokeParticles = useCallback((x, y) => {
+    if (particleCountRef.current >= MAX_PARTICLES) return
+
+    const particle = document.createElement('div')
+    particle.className = 'cursor-particle smoke-particle'
+    const angle = Date.now() * 0.02
+    const radius = 15
+    particle.style.cssText = `
+      left: ${x - 6}px;
+      top: ${y - 6}px;
+      --tx: ${Math.cos(angle) * radius}px;
+      --ty: ${Math.sin(angle) * radius}px;
+    `
+    document.body.appendChild(particle)
+    particleCountRef.current++
+
+    setTimeout(() => {
+      particle.remove()
+      particleCountRef.current--
+    }, PARTICLE_LIFETIME)
+  }, [])
 
   useEffect(() => {
     const cursor = cursorRef.current
-    let currentX = 0, currentY = 0
-    let smokeInterval
-    let isHoveringLink = false
-
-    const handleMouseMove = (e) => {
-      currentX = e.clientX
-      currentY = e.clientY
-      if (cursor) {
-        cursor.style.left = `${currentX - 16}px`
-        cursor.style.top = `${currentY - 16}px`
-      }
-
-      const newHoverState = checkParentForHref(document.elementFromPoint(currentX, currentY))
-      if (newHoverState !== isHoveringLink) {
-        isHoveringLink = newHoverState
-        cursor?.classList.toggle('fast-rotate', isHoveringLink)
-
-        if (isHoveringLink) {
-          smokeInterval = setInterval(() => createSmokeParticles(currentX, currentY), 30)
-        } else {
-          clearInterval(smokeInterval)
-        }
-      }
-
-      createStandardParticles(currentX, currentY, isHoveringLink)
-    }
-
-    const createStandardParticles = (x, y, isLink) => {
-      const particle = document.createElement('div')
-      particle.className = 'cursor-particle'
-      particle.style.cssText = `
-        width: ${isLink ? '6px' : '8px'};
-        height: ${isLink ? '6px' : '8px'};
-        left: ${x - (isLink ? 3 : 4)}px;
-        top: ${y - (isLink ? 3 : 4)}px;
-        background: ${isLink
-          ? 'radial-gradient(circle, rgba(255,255,255,0.6) 20%, rgba(0,255,255,0.3) 100%)'
-          : 'radial-gradient(circle, rgba(255,100,200,0.4) 20%, rgba(255,50,150,0.2) 100%)'};
-      `
-      document.body.appendChild(particle)
-      setTimeout(() => particle.remove(), 800)
-    }
-
-    const createSmokeParticles = (currentX, currentY) => {
-      for (let i = 0; i < 2; i++) {
-        const particle = document.createElement('div')
-        particle.className = 'cursor-particle smoke-particle'
-
-        const angle = Date.now() * 0.02 + (i * Math.PI)
-        const radius = 15
-        particle.style.cssText = `
-          left: ${currentX - 6}px;
-          top: ${currentY - 6}px;
-          --tx: ${Math.cos(angle) * radius}px;
-          --ty: ${Math.sin(angle) * radius}px;
-        `
-
-        document.body.appendChild(particle)
-        setTimeout(() => particle.remove(), 600)
-      }
-    }
 
     const checkParentForHref = (element) => {
-      let currentElement = element
-      while (currentElement) {
-        if (currentElement.hasAttribute('href')) return true
-        currentElement = currentElement.parentElement
+      let current = element
+      while (current) {
+        if (current.hasAttribute?.('href')) return true
+        current = current.parentElement
       }
       return false
     }
 
-    document.addEventListener('mousemove', handleMouseMove)
+    const processFrame = () => {
+      rafIdRef.current = null
+      const pos = pendingMouseRef.current
+      if (!pos) return
+
+      const { x, y } = pos
+
+      if (cursor) {
+        cursor.style.transform = `translate3d(${x - 16}px, ${y - 16}px, 0)`
+      }
+
+      const hoveredEl = document.elementFromPoint(x, y)
+      const newHoverState = checkParentForHref(hoveredEl)
+
+      if (newHoverState !== isHoveringLinkRef.current) {
+        isHoveringLinkRef.current = newHoverState
+        cursor?.classList.toggle('fast-rotate', newHoverState)
+
+        if (newHoverState) {
+          smokeIntervalRef.current = setInterval(
+            () => createSmokeParticles(pendingMouseRef.current?.x ?? x, pendingMouseRef.current?.y ?? y),
+            SMOKE_INTERVAL
+          )
+        } else {
+          clearInterval(smokeIntervalRef.current)
+        }
+      }
+
+      createParticle(x, y, isHoveringLinkRef.current)
+    }
+
+    const handleMouseMove = (e) => {
+      pendingMouseRef.current = { x: e.clientX, y: e.clientY }
+      if (!rafIdRef.current) {
+        rafIdRef.current = requestAnimationFrame(processFrame)
+      }
+    }
+
+    document.addEventListener('mousemove', handleMouseMove, { passive: true })
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
-      clearInterval(smokeInterval)
+      clearInterval(smokeIntervalRef.current)
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
     }
-  }, [])
+  }, [createParticle, createSmokeParticles])
 
   return (
     <>
-      <div className="custom-cursor" ref={cursorRef}></div>
+      <div className="custom-cursor" ref={cursorRef} style={{ willChange: 'transform' }}></div>
       <a
         href="https://www.cursors-4u.com/cursor/2017/03/17/flow-busy.html"
         target="_blank"

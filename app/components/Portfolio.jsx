@@ -13,43 +13,64 @@ const Portfolio = () => {
         category: 'Undergraduate Thesis',
         image: '/assets/images/latest-portfolio/LandslideSusceptibilityMap.png',
         link: '/Portfolio/Undergraduate Thesis.html'
-      }
-    ],
-    'nav-branding': [
+      },
       {
-        id: 1,
+        id: 2,
         title: 'UPD Cartography',
         category: 'Public Webmap',
         image: '/assets/images/latest-portfolio/UPDCr.png',
         link: '/Portfolio/UPD CRtography.html'
       },
       {
-        id: 2,
+        id: 3,
+        title: 'EleksyonPH',
+        category: 'Election Map',
+        image: '/assets/images/latest-portfolio/eleksyon.png',
+        link: '/Portfolio/EleksyonPH.html'
+      }
+    ],
+    'nav-branding': [
+      {
+        id: 1,
         title: 'OSP Map Demo',
         category: 'Demo Web Application',
         image: '/assets/images/latest-portfolio/OSPMapDemo.png',
         link: '/Portfolio/OSPMapDemo.html'
       },
       {
-        id: 3,
+        id: 2,
         title: 'Wedding Planner',
         category: 'Web Development',
         image: '/assets/images/latest-portfolio/wed.png',
         link: '/Portfolio/WeddingPlanner.html'
       },
       {
-        id: 4,
+        id: 3,
         title: 'Aera',
         category: 'Web Application',
         image: '/assets/images/latest-portfolio/Aera.png',
         link: '/Portfolio/Aera.html'
       },
       {
-        id: 5,
+        id: 4,
         title: 'AeraLink',
         category: 'Web Application',
         image: '/assets/images/latest-portfolio/AeraLink.png',
         link: '/Portfolio/AeraLink.html'
+      },
+      {
+        id: 5,
+        title: "Joe's Commercial Cleaning",
+        category: 'Web Development',
+        image: '/assets/images/latest-portfolio/joes.png',
+        link: '/Portfolio/JoesCommercialCleaning.html'
+      },
+      {
+        id: 6,
+        title: 'JJ Spotless',
+        category: 'Web Development',
+        image: '/assets/images/latest-portfolio/jj.png',
+        link: '/Portfolio/JJSpotless.html'
       }
     ],
     'nav-design': [

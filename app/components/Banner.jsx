@@ -1,8 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 
 const Banner = () => {
+  const intervalRef = useRef(null)
+
   useEffect(() => {
     const roles = [
       'a GIS Professional',
@@ -16,122 +19,68 @@ const Banner = () => {
     const roleElement = document.querySelector('.header-caption .cd-words-wrapper')
 
     if (roleElement) {
-      const interval = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         currentRoleIndex = (currentRoleIndex + 1) % roles.length
         roleElement.innerHTML = `<b class="theme-gradient">${roles[currentRoleIndex]}</b>`
       }, 3000)
-
-      return () => clearInterval(interval)
     }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [])
+
+  const initParticles = useCallback(() => {
+    if (!window.particlesJS) return
+
+    window.particlesJS('particles-js', {
+      particles: {
+        number: {
+          value: 5,
+          density: { enable: true, value_area: 1000 }
+        },
+        color: { value: ['#ffffff'] },
+        shape: {
+          type: 'star',
+          stroke: { width: 0, color: '#000000' },
+          polygon: { nb_sides: 5 }
+        },
+        opacity: {
+          value: 0.6,
+          random: true,
+          anim: { enable: false }
+        },
+        size: {
+          value: 3,
+          random: true,
+          anim: { enable: false }
+        },
+        line_linked: { enable: false },
+        move: {
+          enable: true,
+          speed: 3,
+          direction: 'none',
+          random: true,
+          straight: false,
+          out_mode: 'out',
+          attract: { enable: false }
+        }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: {
+          onhover: { enable: false },
+          onclick: { enable: false },
+          resize: true
+        }
+      },
+      retina_detect: false
+    })
   }, [])
 
   useEffect(() => {
-    if (window.particlesJS) {
-      window.particlesJS('particles-js', {
-        particles: {
-          number: {
-            value: 7,
-            density: {
-              enable: true,
-              value_area: 800
-            }
-          },
-          color: {
-            value: ["#ffffff"]
-          },
-          shape: {
-            type: "star",
-            stroke: {
-              width: 0,
-              color: "#000000"
-            },
-            polygon: {
-              nb_sides: 5
-            }
-          },
-          opacity: {
-            value: 0.8,
-            random: true,
-            anim: {
-              enable: false,
-              speed: 1,
-              opacity_min: 0.1,
-              sync: false
-            }
-          },
-          size: {
-            value: 3,
-            random: true,
-            anim: {
-              enable: false,
-              speed: 20,
-              size_min: 0.1,
-              sync: false
-            }
-          },
-          line_linked: {
-            enable: false,
-            distance: 150,
-            color: "#ffffff",
-            opacity: 0.4,
-            width: 1
-          },
-          move: {
-            enable: true,
-            speed: 6,
-            direction: "none",
-            random: false,
-            straight: false,
-            out_mode: "out",
-            attract: {
-              enable: false,
-              rotateX: 600,
-              rotateY: 1200
-            }
-          }
-        },
-        interactivity: {
-          detect_on: "canvas",
-          events: {
-            onhover: {
-              enable: false,
-              mode: "repulse"
-            },
-            onclick: {
-              enable: false,
-              mode: "push"
-            },
-            resize: true
-          },
-          modes: {
-            grab: {
-              distance: 400,
-              line_linked: {
-                opacity: 1
-              }
-            },
-            bubble: {
-              distance: 800,
-              size: 40,
-              duration: 2,
-              opacity: 8,
-              speed: 3
-            },
-            repulse: {
-              distance: 200
-            },
-            push: {
-              particles_nb: 4
-            },
-            remove: {
-              particles_nb: 2
-            }
-          }
-        },
-        retina_detect: true
-      })
-    }
-  }, [])
+    initParticles()
+  }, [initParticles])
 
   return (
     <div className="tmp-banner-one-area style-4" id="home">
@@ -141,7 +90,14 @@ const Banner = () => {
             <div className="col-lg-12">
               <div className="inner text-center">
                 <div className="thumbnail-author">
-                  <img src="/assets/images/banner/header-bg2.png" alt="personal-logo" />
+                  <Image
+                    src="/assets/images/banner/header-bg2.png"
+                    alt="personal-logo"
+                    width={350}
+                    height={350}
+                    priority
+                    quality={80}
+                  />
                 </div>
                 <h1 className="title tmp-scroll-trigger tmp-fade-in animation-order-2">
                   I&apos;m Isaac Enage, <br />
