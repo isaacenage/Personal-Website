@@ -73,8 +73,8 @@ const Header = () => {
       </header>
 
       {/* Mobile Menu */}
-      <div className={`d-block d-xl-none ${isMobileMenuOpen ? 'show' : ''}`}>
-        <div className="tmp-popup-mobile-menu">
+      <div className="d-block d-xl-none">
+        <div className={`tmp-popup-mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
           <div className="inner">
             <div className="header-top">
               <div className="logo">

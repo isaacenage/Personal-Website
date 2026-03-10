@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 
 const MAX_PARTICLES = 15
 const PARTICLE_LIFETIME = 600
@@ -13,6 +13,12 @@ const CustomCursor = () => {
   const pendingMouseRef = useRef(null)
   const isHoveringLinkRef = useRef(false)
   const smokeIntervalRef = useRef(null)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
+
+  useEffect(() => {
+    const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    setIsTouchDevice(hasTouchScreen)
+  }, [])
 
   const createParticle = useCallback((x, y, isLink) => {
     if (particleCountRef.current >= MAX_PARTICLES) return
@@ -120,6 +126,8 @@ const CustomCursor = () => {
     }
   }, [createParticle, createSmokeParticles])
 
+  if (isTouchDevice) return null
+
   return (
     <>
       <div className="custom-cursor" ref={cursorRef} style={{ willChange: 'transform' }}></div>
@@ -127,7 +135,7 @@ const CustomCursor = () => {
         href="https://www.cursors-4u.com/cursor/2017/03/17/flow-busy.html"
         target="_blank"
         rel="noopener noreferrer"
-        style={{ position: 'fixed', top: 0, right: 0, zIndex: 9996 }}
+        style={{ position: 'fixed', top: 0, right: 0, zIndex: 9996, pointerEvents: 'none' }}
       >
         <img src="https://cur.cursors-4u.net/cursor.png" alt="Cursor Attribution" />
       </a>

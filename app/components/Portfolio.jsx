@@ -32,45 +32,45 @@ const Portfolio = () => {
     'nav-branding': [
       {
         id: 1,
-        title: 'OSP Map Demo',
-        category: 'Demo Web Application',
-        image: '/assets/images/latest-portfolio/OSPMapDemo.png',
-        link: '/Portfolio/OSPMapDemo'
-      },
-      {
-        id: 2,
-        title: 'Wedding Planner',
-        category: 'Web Development',
-        image: '/assets/images/latest-portfolio/wed.png',
-        link: '/Portfolio/WeddingPlanner'
-      },
-      {
-        id: 3,
-        title: 'Aera',
-        category: 'Web Application',
-        image: '/assets/images/latest-portfolio/Aera.png',
-        link: '/Portfolio/Aera'
-      },
-      {
-        id: 4,
-        title: 'AeraLink',
-        category: 'Web Application',
-        image: '/assets/images/latest-portfolio/AeraLink.png',
-        link: '/Portfolio/AeraLink'
-      },
-      {
-        id: 5,
         title: "Joe's Commercial Cleaning",
         category: 'Web Development',
         image: '/assets/images/latest-portfolio/joes.png',
         link: '/Portfolio/JoesCommercialCleaning'
       },
       {
-        id: 6,
+        id: 2,
         title: 'JJ Spotless',
         category: 'Web Development',
         image: '/assets/images/latest-portfolio/jj.png',
         link: '/Portfolio/JJSpotless'
+      },
+      {
+        id: 3,
+        title: 'Wedding Planner',
+        category: 'Web Development',
+        image: '/assets/images/latest-portfolio/wed.png',
+        link: 'https://weddingdashboard.isaacenage.xyz/'
+      },
+      {
+        id: 4,
+        title: 'OSP Map Demo',
+        category: 'Demo Web Application',
+        image: '/assets/images/latest-portfolio/OSPMapDemo.png',
+        link: '/Portfolio/OSPMapDemo'
+      },
+      {
+        id: 5,
+        title: 'Aera',
+        category: 'Web Application',
+        image: '/assets/images/latest-portfolio/Aera.png',
+        link: '/Portfolio/Aera'
+      },
+      {
+        id: 6,
+        title: 'AeraLink',
+        category: 'Web Application',
+        image: '/assets/images/latest-portfolio/AeraLink.png',
+        link: '/Portfolio/AeraLink'
       }
     ],
     'nav-design': [
