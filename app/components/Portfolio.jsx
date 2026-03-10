@@ -117,7 +117,7 @@ const Portfolio = () => {
         </div>
 
         <div className="latest-portfolio-tabs-area">
-          <nav>
+          <nav style={{ position: 'relative', zIndex: 2 }}>
             <ul className="nav nav-tabs tmp-scroll-trigger tmp-fade-in animation-order-4" id="nav-tab" role="tablist">
               <li>
                 <button
