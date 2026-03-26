@@ -16,6 +16,35 @@
       width: 100vw;
       height: 100vh;
     }
+    .watermark {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 9999;
+      overflow: hidden;
+    }
+    .watermark span {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 4vw;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.08);
+      white-space: nowrap;
+      transform: rotate(-30deg);
+      user-select: none;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    @media (max-width: 768px) {
+      .watermark {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -23,5 +52,8 @@
     src="https://bulalacaohazardmap.vercel.app"
     allowfullscreen
   ></iframe>
+  <div class="watermark">
+    <span>Demo Presentation &mdash; Prepared by Isaac Enage</span>
+  </div>
 </body>
 </html>
