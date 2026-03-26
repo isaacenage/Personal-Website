@@ -33,7 +33,7 @@ const Portfolio = () => {
         title: 'BDDRRMIS Demo',
         category: 'Demo WebGIS Application',
         image: '/assets/images/latest-portfolio/bddrrmis.png',
-        link: '/bddrrmis-demo'
+        link: '/Portfolio/bddrmis'
       }
     ],
     'nav-branding': [
