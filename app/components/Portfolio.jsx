@@ -27,6 +27,13 @@ const Portfolio = () => {
         category: 'Election Map',
         image: '/assets/images/latest-portfolio/eleksyon.png',
         link: '/Portfolio/EleksyonPH'
+      },
+      {
+        id: 4,
+        title: 'BDDRRMIS Demo',
+        category: 'Demo WebGIS Application',
+        image: '/assets/images/latest-portfolio/bddrrmis.png',
+        link: '/bddrrmis-demo'
       }
     ],
     'nav-branding': [
