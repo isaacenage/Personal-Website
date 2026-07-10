@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber'
@@ -12,7 +12,8 @@ import { ArrowUpRight, X } from 'lucide-react'
    the starfield renders inside the same R3F canvas instead of a second WebGL
    context, the frameloop pauses while the section is offscreen, DPR is capped
    at 1.5, zoom/pan stay disabled so Lenis keeps the wheel, and the teal
-   accents are remapped onto the cosmic tokens. */
+   accents are remapped onto the cosmic tokens. The cards and the detail
+   modal wear the same chamfered HUD plate as components/ui/hud-button.tsx. */
 
 export type WorkItem = {
   id: string | number
@@ -25,6 +26,114 @@ export type WorkItem = {
 const ACCENT = '#6fe3ff'
 const SHELL_BLUE = '#3a6bff'
 const CARD_BG = 'var(--cosmos-ink, #0b0e18)'
+
+/* HUD plate geometry, mirroring Style2Svg in components/ui/hud-button.tsx:
+   a chamfered frame inset 4px on the left so the small edge dots sit outside
+   the outline, with the 2×2 dot cluster tucked into the top-right corner. */
+const CARD_W = 200
+const CARD_H = 170
+const CARD_FRAME_PATH =
+  'M12.5 0.5H191.5L199.5 8.5V161.5L191.5 169.5H12.5L4.5 161.5V8.5Z'
+const CARD_DOTS = [
+  { cx: 187.2, cy: 4, r: 1.2 },
+  { cx: 187.2, cy: 8.2, r: 1.2 },
+  { cx: 191.7, cy: 4, r: 1.2 },
+  { cx: 191.7, cy: 8.2, r: 1.2 },
+  { cx: 0.7, cy: 82.4, r: 0.65 },
+  { cx: 0.7, cy: 87.7, r: 0.65 },
+]
+
+/* STYLE2_FILL_STOPS from hud-button.tsx — with the same overshot gradient
+   span the plate lands at ~45% ink up top fading to ~15% at the bottom,
+   which is what makes the Category button read as translucent glass. */
+const CARD_FILL_STOPS: Array<[number, number]> = [
+  [0, 0.95], [0.005, 0.92], [0.085, 0.85], [0.17, 0.75], [0.258, 0.65], [0.351, 0.55],
+  [0.449, 0.45], [0.554, 0.35], [0.669, 0.25], [0.804, 0.15], [1, 0],
+]
+
+/* clip-path chamfer for elements whose size isn't fixed (modal, images) —
+   clip-path can't draw a border, so bordered plates layer two clipped divs */
+const chamferClip = (cut: number) =>
+  `polygon(${cut}px 0, calc(100% - ${cut}px) 0, 100% ${cut}px, 100% calc(100% - ${cut}px), calc(100% - ${cut}px) 100%, ${cut}px 100%, 0 calc(100% - ${cut}px), 0 ${cut}px)`
+
+/* Chamfered HUD plate — the card-sized cousin of the button's Style2Svg:
+   translucent ink fill (the starfield shows through, like the Category
+   button), accent tint falling from the top edge, 1px outline, and the
+   signature corner dots. Hover brightens the tint, outline, and dots. */
+function HudCardFrame({ hovered }: { hovered: boolean }) {
+  /* useId can emit colons, which break url(#…) gradient references */
+  const uid = useId().replace(/[^a-zA-Z0-9-]/g, '')
+  const fillId = `hud-card-f-${uid}`
+  const tintId = `hud-card-t-${uid}`
+  return (
+    <svg
+      viewBox={`0 0 ${CARD_W} ${CARD_H}`}
+      width={CARD_W}
+      height={CARD_H}
+      aria-hidden="true"
+      style={{ position: 'absolute', inset: 0, display: 'block' }}
+    >
+      <defs>
+        {/* gradient overshoots the shape by the same ±1.2/1.56 height ratio
+           as the button, so only its translucent middle lands on the plate */}
+        <linearGradient
+          id={fillId}
+          x1={CARD_W / 2}
+          y1={-CARD_H * 1.19}
+          x2={CARD_W / 2}
+          y2={CARD_H * 1.56}
+          gradientUnits="userSpaceOnUse"
+        >
+          {CARD_FILL_STOPS.map(([offset, opacity]) => (
+            <stop key={offset} offset={offset} stopColor="#10141f" stopOpacity={opacity} />
+          ))}
+        </linearGradient>
+        <linearGradient
+          id={tintId}
+          x1={CARD_W / 2}
+          y1="0"
+          x2={CARD_W / 2}
+          y2={CARD_H}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stopColor={ACCENT} stopOpacity={0.22} />
+          <stop offset="0.45" stopColor={ACCENT} stopOpacity={0.05} />
+          <stop offset="1" stopColor={ACCENT} stopOpacity={0} />
+        </linearGradient>
+      </defs>
+      <path d={CARD_FRAME_PATH} fill={`url(#${fillId})`} />
+      <path
+        d={CARD_FRAME_PATH}
+        fill={`url(#${tintId})`}
+        style={{ opacity: hovered ? 1 : 0.55, transition: 'opacity 0.3s ease' }}
+      />
+      <path
+        d={CARD_FRAME_PATH}
+        fill="none"
+        strokeWidth={1}
+        style={{
+          stroke: hovered ? ACCENT : 'rgba(111, 227, 255, 0.4)',
+          transition: 'stroke 0.3s ease',
+        }}
+      />
+      {CARD_DOTS.map((dot) => (
+        <circle
+          key={`${dot.cx}-${dot.cy}`}
+          cx={dot.cx}
+          cy={dot.cy}
+          r={dot.r}
+          fill={ACCENT}
+          style={{
+            transformBox: 'fill-box',
+            transformOrigin: 'center',
+            transform: hovered ? 'scale(1.3)' : 'scale(1)',
+            transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          }}
+        />
+      ))}
+    </svg>
+  )
+}
 
 /* =========================
    Starfield (in-scene)
@@ -95,6 +204,8 @@ function FloatingCard({
       <mesh
         onClick={(e) => {
           e.stopPropagation()
+          /* a rotate-drag that ends on a card is not a click */
+          if (e.delta > 5) return
           onSelect(item)
         }}
         onPointerOver={(e) => {
@@ -107,7 +218,7 @@ function FloatingCard({
           document.body.style.cursor = 'auto'
         }}
       >
-        <planeGeometry args={[5.6, 5.3]} />
+        <planeGeometry args={[5.6, 4.8]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
@@ -115,69 +226,89 @@ function FloatingCard({
         transform
         distanceFactor={10}
         position={[0, 0, 0.01]}
+        /* the prop (not just style) matters: drei's transform-mode wrapper div
+           defaults to pointer-events auto and would eat clicks over the card
+           body, leaving only the hit plane's edges clickable */
+        pointerEvents="none"
         style={{
           transition: 'transform 0.3s ease',
           transform: hovered ? 'scale(1.12)' : 'scale(1)',
           pointerEvents: 'none',
         }}
       >
-        <div
-          style={{
-            width: 200,
-            padding: 10,
-            borderRadius: 10,
-            background: CARD_BG,
-            userSelect: 'none',
-            border: hovered
-              ? '1px solid rgba(111, 227, 255, 0.55)'
-              : '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: hovered
-              ? '0 25px 50px rgba(111, 227, 255, 0.35), 0 0 30px rgba(111, 227, 255, 0.2)'
-              : '0 15px 30px rgba(0, 0, 0, 0.6)',
-          }}
-        >
-          <img
-            src={item.image}
-            alt={item.title}
-            loading="lazy"
-            draggable={false}
+        <div style={{ position: 'relative', width: CARD_W, height: CARD_H, userSelect: 'none' }}>
+          {/* radial glow behind the plate, same trick as .hud-btn-glow */}
+          <div
+            aria-hidden="true"
             style={{
-              width: '100%',
-              aspectRatio: '16 / 10',
-              objectFit: 'cover',
-              borderRadius: 7,
-              display: 'block',
-              background: '#000',
+              position: 'absolute',
+              inset: -18,
+              background: 'radial-gradient(circle, rgba(111, 227, 255, 0.35) 0%, transparent 70%)',
+              opacity: hovered ? 1 : 0,
+              transform: hovered ? 'scale(1.08)' : 'scale(0.85)',
+              transition: 'opacity 0.3s ease, transform 0.3s ease',
+              pointerEvents: 'none',
             }}
           />
-          <div style={{ marginTop: 8 }}>
-            <div
+          <HudCardFrame hovered={hovered} />
+          {/* content is offset 4px left (edge dots) and 12px top (dot cluster) */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 4,
+              padding: '12px 10px 0',
+            }}
+          >
+            <img
+              src={item.image}
+              alt={item.title}
+              loading="lazy"
+              draggable={false}
               style={{
-                fontSize: 8,
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: 'rgba(244, 246, 255, 0.55)',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                width: '100%',
+                aspectRatio: '16 / 10',
+                objectFit: 'cover',
+                clipPath: chamferClip(6),
+                display: 'block',
+                background: '#000',
               }}
-            >
-              {item.category}
+            />
+            <div style={{ marginTop: 8 }}>
+              <div
+                style={{
+                  fontSize: 8,
+                  lineHeight: '10px',
+                  letterSpacing: '0.3em',
+                  textTransform: 'uppercase',
+                  color: hovered ? 'rgba(111, 227, 255, 0.9)' : 'rgba(244, 246, 255, 0.55)',
+                  transition: 'color 0.3s ease',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {item.category}
+              </div>
+              <p
+                style={{
+                  margin: '4px 0 0',
+                  fontSize: 11,
+                  lineHeight: '15px',
+                  fontWeight: 600,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: '#dcf5ff',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {item.title}
+              </p>
             </div>
-            <p
-              style={{
-                margin: '4px 0 0',
-                fontSize: 12,
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                color: '#fff',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {item.title}
-            </p>
           </div>
         </div>
       </Html>
@@ -314,82 +445,116 @@ function WorkModal({ item, onClose }: { item: WorkItem; onClose: () => void }) {
         </button>
 
         <div style={{ perspective: '1000px' }}>
+          {/* preserve-3d dropped (no 3D children) so drop-shadow can trace
+             the chamfered silhouette — box-shadow gets clipped away */}
           <div
             ref={cardRef}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            style={{
-              borderRadius: 16,
-              background: CARD_BG,
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              padding: 16,
-              transformStyle: 'preserve-3d',
-              boxShadow:
-                'rgba(0, 0, 0, 0.26) 0px 83px 83px 0px, rgba(0, 0, 0, 0.29) 0px 21px 46px 0px',
-            }}
+            style={{ filter: 'drop-shadow(0 40px 60px rgba(0, 0, 0, 0.55))' }}
           >
-            <img
-              src={item.image}
-              alt={item.title}
-              loading="lazy"
-              style={{
-                width: '100%',
-                aspectRatio: '16 / 10',
-                objectFit: 'cover',
-                borderRadius: 10,
-                display: 'block',
-                background: '#000',
-                marginBottom: 14,
-              }}
-            />
-
+            {/* outer gradient layer peeks 1px past the inner fill to draw
+               the outline, since clip-path can't render a border */}
             <div
               style={{
-                fontSize: 10,
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: 'rgba(244, 246, 255, 0.55)',
-                textAlign: 'center',
+                clipPath: chamferClip(14),
+                background:
+                  'linear-gradient(180deg, rgba(111, 227, 255, 0.85) 0%, rgba(111, 227, 255, 0.25) 60%, rgba(111, 227, 255, 0.45) 100%)',
+                padding: 1,
               }}
             >
-              {item.category}
-            </div>
-            <h3
-              style={{
-                margin: '6px 0 16px',
-                fontSize: 18,
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                color: '#fff',
-                textAlign: 'center',
-              }}
-            >
-              {item.title}
-            </h3>
+              <div
+                style={{
+                  position: 'relative',
+                  clipPath: chamferClip(13),
+                  background: CARD_BG,
+                  padding: '26px 16px 16px',
+                }}
+              >
+                {/* top-right dot cluster, the HUD buttons' signature */}
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', top: 9, right: 12, display: 'block' }}
+                >
+                  {[
+                    { cx: 3, cy: 3 },
+                    { cx: 3, cy: 9 },
+                    { cx: 9, cy: 3 },
+                    { cx: 9, cy: 9 },
+                  ].map((dot) => (
+                    <circle key={`${dot.cx}-${dot.cy}`} cx={dot.cx} cy={dot.cy} r={1.3} fill={ACCENT} />
+                  ))}
+                </svg>
 
-            <a
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex',
-                width: '100%',
-                height: 40,
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                borderRadius: 10,
-                background: ACCENT,
-                color: '#05070f',
-                fontSize: 14,
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                textDecoration: 'none',
-              }}
-            >
-              View project
-              <ArrowUpRight size={16} strokeWidth={2} />
-            </a>
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  loading="lazy"
+                  style={{
+                    width: '100%',
+                    aspectRatio: '16 / 10',
+                    objectFit: 'cover',
+                    clipPath: chamferClip(8),
+                    display: 'block',
+                    background: '#000',
+                    marginBottom: 14,
+                  }}
+                />
+
+                <div
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.3em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(244, 246, 255, 0.55)',
+                    textAlign: 'center',
+                  }}
+                >
+                  {item.category}
+                </div>
+                <h3
+                  style={{
+                    margin: '6px 0 16px',
+                    fontSize: 16,
+                    fontWeight: 600,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: '#dcf5ff',
+                    textAlign: 'center',
+                  }}
+                >
+                  {item.title}
+                </h3>
+
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    width: '100%',
+                    height: 44,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    clipPath: chamferClip(8),
+                    background: ACCENT,
+                    color: '#05070f',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    textDecoration: 'none',
+                  }}
+                >
+                  View project
+                  <ArrowUpRight size={16} strokeWidth={2.25} />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

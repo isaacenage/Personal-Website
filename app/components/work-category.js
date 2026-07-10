@@ -11,7 +11,6 @@ export const WORK_CATEGORIES = [
   { key: 'maps', label: 'Maps' },
   { key: 'websites', label: 'Websites' },
   { key: 'tools', label: 'Tools' },
-  { key: 'analytics', label: 'Analytics' },
 ]
 
 const DEFAULT_CATEGORY = 'all'
