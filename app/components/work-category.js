@@ -7,13 +7,14 @@ import { useSyncExternalStore } from 'react'
    tiny external store instead of a context threaded through PageShell. */
 
 export const WORK_CATEGORIES = [
+  { key: 'all', label: 'All' },
   { key: 'maps', label: 'Maps' },
   { key: 'websites', label: 'Websites' },
   { key: 'tools', label: 'Tools' },
   { key: 'analytics', label: 'Analytics' },
 ]
 
-const DEFAULT_CATEGORY = 'maps'
+const DEFAULT_CATEGORY = 'all'
 
 let category = DEFAULT_CATEGORY
 const listeners = new Set()

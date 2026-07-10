@@ -178,15 +178,22 @@ const portfolioData = {
   ],
 }
 
+/* "All" merges every group; ids are namespaced because the gallery uses them
+   as React keys and each group numbers its items from 1 */
+const allItems = Object.entries(portfolioData).flatMap(([group, items]) =>
+  items.map((item) => ({ ...item, id: `${group}-${item.id}` }))
+)
+
 const Portfolio = () => {
   /* driven by the Category dropdown in the header (see work-category.js) */
   const activeCategory = useWorkCategory()
+  const items = activeCategory === 'all' ? allItems : portfolioData[activeCategory]
 
   return (
     /* fullscreen stage: the gallery fills the viewport and the fixed header
        (z 100) floats above it */
     <section className="cosmic-work-stage" id="portfolio">
-      <StellarWorkGallery key={activeCategory} items={portfolioData[activeCategory]} />
+      <StellarWorkGallery key={activeCategory} items={items} />
     </section>
   )
 }
