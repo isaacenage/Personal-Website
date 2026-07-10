@@ -131,8 +131,8 @@ body {
   -webkit-text-stroke: 1px rgba(230, 240, 255, 0.14);
   filter: drop-shadow(0 0 16px rgba(111, 227, 255, 0));
   transition:
-    background-position 0.85s cubic-bezier(0.4, 0, 0.2, 1),
-    filter 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+    background-position 0.17s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.17s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
@@ -169,7 +169,7 @@ body {
     0 0 6px rgba(111, 227, 255, 0.95),
     0 0 18px rgba(111, 227, 255, 0.6),
     0 0 44px rgba(58, 107, 255, 0.55);
-  transition: left 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: left 0.17s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cosmic-title:hover {
@@ -234,7 +234,12 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 32px;
+  /* Second declaration wins where env() is supported: keeps the bar clear
+     of dynamic islands / notches / status bars on any phone layout. */
   padding: 26px 40px;
+  padding: calc(26px + env(safe-area-inset-top, 0px))
+    calc(40px + env(safe-area-inset-right, 0px)) 26px
+    calc(40px + env(safe-area-inset-left, 0px));
   pointer-events: none;
 }
 
@@ -349,6 +354,10 @@ body {
      was invisible but re-blurred the page every frame of the open/close
      fade — the single worst effect for low-end GPUs. */
   background: rgba(0, 0, 0, 0.97);
+  /* The overlay itself extends under notches/home indicator (inset: 0 with
+     viewport-fit=cover); padding keeps the links inside the safe area. */
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.4s ease, visibility 0.4s ease;
@@ -376,7 +385,9 @@ body {
 .cosmic-mobile-close {
   position: absolute;
   top: 28px;
+  top: calc(28px + env(safe-area-inset-top, 0px));
   right: 32px;
+  right: calc(32px + env(safe-area-inset-right, 0px));
   background: none;
   border: 0;
   color: var(--haze);
@@ -397,6 +408,9 @@ body {
 @media (max-width: 1199px) {
   .cosmic-header {
     padding: 20px 24px;
+    padding: calc(20px + env(safe-area-inset-top, 0px))
+      calc(24px + env(safe-area-inset-right, 0px)) 20px
+      calc(24px + env(safe-area-inset-left, 0px));
   }
 
   .cosmic-nav,
@@ -407,6 +421,10 @@ body {
 
   .cosmic-mobile-toggle {
     display: flex;
+    /* Pin to the top-right corner of the viewport regardless of what other
+       header children render. */
+    order: 99;
+    margin-left: auto;
   }
 }
 

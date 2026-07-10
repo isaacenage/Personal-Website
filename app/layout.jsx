@@ -6,6 +6,19 @@ import './styles/cosmic-chat.css'
 import ScrollToTop from './components/ScrollToTop'
 import ChatWidget from './components/ChatWidget'
 import SmoothScroll from './components/SmoothScroll'
+import InteractionGuard from './components/InteractionGuard'
+
+/* viewportFit: 'cover' draws under notches/dynamic islands/status bars on any
+   phone — the safe-area env() paddings in the stylesheets keep UI clear of
+   them. The scale locks disable pinch/double-tap zoom where the meta tag is
+   honored (Android); InteractionGuard covers iOS Safari, which ignores it. */
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+}
 
 export const metadata = {
   title: 'byZenterra — Geospatial, Analytics & Web Studio',
@@ -23,6 +36,7 @@ export default function RootLayout({ children }) {
         <ScrollToTop />
         <ChatWidget />
         <SmoothScroll />
+        <InteractionGuard />
       </body>
     </html>
   )

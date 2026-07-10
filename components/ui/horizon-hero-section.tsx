@@ -2,9 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
 import RotatingEarth from '@/components/ui/wireframe-dotted-globe'
 
 const TOTAL_SECTIONS = 2
@@ -30,7 +27,6 @@ interface ThreeRefs {
   scene: THREE.Scene | null
   camera: THREE.PerspectiveCamera | null
   renderer: THREE.WebGLRenderer | null
-  composer: EffectComposer | null
   stars: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>[]
   nebula: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> | null
   mountains: THREE.Mesh<THREE.ShapeGeometry, THREE.MeshBasicMaterial>[]
@@ -60,7 +56,6 @@ export const Component = () => {
     scene: null,
     camera: null,
     renderer: null,
-    composer: null,
     stars: [],
     nebula: null,
     mountains: [],
@@ -373,8 +368,8 @@ export const Component = () => {
         mountain.position.y = 50 + Math.cos(time * 0.15) * 1 * parallaxFactor
       })
 
-      if (refs.composer) {
-        refs.composer.render()
+      if (refs.renderer && refs.scene && refs.camera) {
+        refs.renderer.render(refs.scene, refs.camera)
       }
     }
 
@@ -395,13 +390,13 @@ export const Component = () => {
       refs.camera.position.z = 100
       refs.camera.position.y = 20
 
-      // Renderer. antialias off: every frame goes through the bloom
-      // composer's render targets, so MSAA on the default framebuffer never
-      // shows — it only costs memory/fill rate. DPR capped at 1.5: with the
-      // bloom pass on top, 2x is indistinguishable but ~78% more pixels.
+      // Renderer. antialias on: the scene renders straight to the default
+      // framebuffer (no post-processing), so MSAA works and keeps the flat
+      // mountain silhouettes from shimmering. DPR capped at 1.5: 2x is
+      // nearly indistinguishable here but ~78% more pixels.
       refs.renderer = new THREE.WebGLRenderer({
         canvas: canvasRef.current!,
-        antialias: false,
+        antialias: true,
         alpha: true,
         powerPreference: 'high-performance',
       })
@@ -409,19 +404,6 @@ export const Component = () => {
       refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
       refs.renderer.toneMapping = THREE.ACESFilmicToneMapping
       refs.renderer.toneMappingExposure = 0.5
-
-      // Post-processing
-      refs.composer = new EffectComposer(refs.renderer)
-      const renderPass = new RenderPass(refs.scene, refs.camera)
-      refs.composer.addPass(renderPass)
-
-      const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        0.8,
-        0.4,
-        0.85
-      )
-      refs.composer.addPass(bloomPass)
 
       // Create scene elements
       createStarField()
@@ -450,23 +432,22 @@ export const Component = () => {
 
     const handleResize = () => {
       const { current: refs } = threeRefs
-      if (refs.camera && refs.renderer && refs.composer) {
+      if (refs.camera && refs.renderer) {
         refs.camera.aspect = window.innerWidth / window.innerHeight
         refs.camera.updateProjectionMatrix()
         refs.renderer.setSize(window.innerWidth, window.innerHeight)
-        refs.composer.setSize(window.innerWidth, window.innerHeight)
       }
     }
 
     window.addEventListener('resize', handleResize)
 
     // Stop rendering entirely once the hero scrolls out of view — without
-    // this, the bloom-composited scene keeps burning GPU under every other
-    // section of the page.
+    // this, the scene keeps burning GPU under every other section of the
+    // page.
     const visibilityObserver = new IntersectionObserver(([entry]) => {
       const { current: refs } = threeRefs
       if (entry.isIntersecting) {
-        if (refs.animationId === null && refs.composer) {
+        if (refs.animationId === null && refs.renderer) {
           animate()
         }
       } else if (refs.animationId !== null) {
