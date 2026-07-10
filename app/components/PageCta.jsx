@@ -2,7 +2,7 @@ import { AnimatedContainer } from '@/components/ui/animated-container'
 import { HudButton } from '@/components/ui/hud-button'
 
 /* Closing call-to-action band for sub-pages. The contact form lives on the
-   home page, so this routes back to /#contacts. */
+   Get Our Service page, so this routes to /get-involved/services/#contacts. */
 const PageCta = ({
   eyebrow = 'Start a Project',
   title = 'Ready When You Are',
@@ -16,7 +16,7 @@ const PageCta = ({
         <div className="cosmic-line" />
         <p className="cosmic-desc">{description}</p>
         <div className="mt-10">
-          <HudButton href="/#contacts">Get in Touch</HudButton>
+          <HudButton href="/get-involved/services/#contacts">Get in Touch</HudButton>
         </div>
       </AnimatedContainer>
     </div>

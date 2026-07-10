@@ -130,22 +130,8 @@ const Portfolio = () => {
   const [activeTab, setActiveTab] = useState('maps')
 
   return (
-    <section className="cosmic-section" id="portfolio">
+    <section className="cosmic-section pt-0" id="portfolio">
       <div className="cosmic-section-inner space-y-12">
-        <AnimatedContainer className="cosmic-head--center mx-auto max-w-3xl">
-          <span className="cosmic-eyebrow">Our Work</span>
-          <h2 className="cosmic-title">
-            Ideas Made
-            <br />
-            Exceptional
-          </h2>
-          <div className="cosmic-line" />
-          <p className="cosmic-desc">
-            Products and platforms shaped by thoughtful design, intuitive development, and
-            meaningful data storytelling.
-          </p>
-        </AnimatedContainer>
-
         <AnimatedContainer delay={0.25}>
           <div
             className="flex flex-wrap justify-center gap-4"

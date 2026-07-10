@@ -268,7 +268,14 @@ body {
   gap: 34px;
 }
 
-.cosmic-nav a {
+/* Top-level items only (`>`): dropdown panel links style themselves.
+   Links and dropdown triggers share one flex box model with line-height 1
+   so both kinds of item sit on the same baseline — the template CSS and
+   Bootstrap's reboot hand anchors and buttons different line-heights. */
+.cosmic-nav > a {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
   font-size: 11px;
   letter-spacing: 0.32em;
   text-transform: uppercase;
@@ -279,7 +286,7 @@ body {
   transition: color 0.3s ease;
 }
 
-.cosmic-nav a::after {
+.cosmic-nav > a::after {
   content: '';
   position: absolute;
   left: 0;
@@ -292,14 +299,137 @@ body {
   transition: transform 0.3s ease;
 }
 
-.cosmic-nav a:hover,
-.cosmic-nav a.active {
+.cosmic-nav > a:hover,
+.cosmic-nav > a.active {
   color: #fff;
 }
 
-.cosmic-nav a:hover::after,
-.cosmic-nav a.active::after {
+.cosmic-nav > a:hover::after,
+.cosmic-nav > a.active::after {
   transform: scaleX(1);
+}
+
+/* --- Dropdown groups (About Us / Get Involved) --- */
+/* Flex kills the inline line box the wrapper would otherwise wrap around the
+   trigger (inherited 16px font + template line-height), which made the group
+   taller than the sibling links and knocked the trigger off their baseline. */
+.cosmic-nav-group {
+  position: relative;
+  display: flex;
+}
+
+/* The trigger reads exactly like a nav link, plus a chevron. */
+.cosmic-nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 0 6px;
+  margin: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+/* 1em (11px) chevron keeps the trigger's content box exactly the height
+   of the sibling links' text box. */
+.cosmic-nav-trigger svg {
+  width: 1em;
+  height: 1em;
+}
+
+.cosmic-nav-trigger::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: var(--cosmic-gradient);
+  transition: transform 0.3s ease;
+}
+
+.cosmic-nav-trigger svg {
+  transition: transform 0.3s ease;
+}
+
+.cosmic-nav-trigger:hover,
+.cosmic-nav-trigger.active,
+.cosmic-nav-group.open .cosmic-nav-trigger,
+.cosmic-nav-group:focus-within .cosmic-nav-trigger {
+  color: #fff;
+}
+
+.cosmic-nav-trigger:hover::after,
+.cosmic-nav-trigger.active::after,
+.cosmic-nav-group.open .cosmic-nav-trigger::after,
+.cosmic-nav-group:focus-within .cosmic-nav-trigger::after {
+  transform: scaleX(1);
+}
+
+.cosmic-nav-group.open .cosmic-nav-trigger svg,
+.cosmic-nav-group:focus-within .cosmic-nav-trigger svg {
+  transform: rotate(180deg);
+}
+
+/* Outer container doubles as a hover bridge (padding-top, no background)
+   so the cursor never crosses a dead zone between trigger and panel. */
+.cosmic-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, 8px);
+  padding-top: 14px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+}
+
+.cosmic-nav-group.open .cosmic-dropdown,
+.cosmic-nav-group:focus-within .cosmic-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.cosmic-dropdown-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 216px;
+  padding: 14px 0;
+  border: 1px dashed var(--cosmic-dash);
+  background: rgba(5, 7, 15, 0.94);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 0 40px rgba(58, 107, 255, 0.1);
+}
+
+.cosmic-dropdown-panel a {
+  padding: 11px 22px;
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.3s ease, background 0.3s ease;
+}
+
+.cosmic-dropdown-panel a:hover,
+.cosmic-dropdown-panel a.active {
+  color: #fff;
+  background: rgba(111, 227, 255, 0.06);
 }
 
 .cosmic-socials {
@@ -350,6 +480,8 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  /* The grouped nav is taller than a short landscape viewport. */
+  overflow-y: auto;
   /* Near-opaque solid instead of backdrop-filter: at 0.92 alpha the blur
      was invisible but re-blurred the page every frame of the open/close
      fade — the single worst effect for low-end GPUs. */
@@ -403,6 +535,27 @@ body {
 
 .cosmic-mobile-menu .cosmic-header-cta {
   margin-top: 32px;
+}
+
+/* Grouped links (About Us / Get Involved) inside the mobile overlay. */
+.cosmic-mobile-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.cosmic-mobile-group-label {
+  padding: 10px 14px 2px;
+  font-size: 10px;
+  letter-spacing: 0.44em;
+  text-transform: uppercase;
+  color: rgba(111, 227, 255, 0.55);
+}
+
+.cosmic-mobile-group a {
+  font-size: 13px;
+  padding: 10px 14px;
 }
 
 @media (max-width: 1199px) {
@@ -828,11 +981,12 @@ textarea.cosmic-input {
   color: var(--haze);
 }
 
-/* --- Footer --- */
+/* --- Footer (21st.dev @nurui hover-footer on the cosmic tokens) --- */
 .cosmic-footer {
   position: relative;
-  padding: 80px 24px 48px;
-  text-align: center;
+  overflow: hidden;
+  padding: 96px 24px 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .cosmic-footer::before {
@@ -846,14 +1000,135 @@ textarea.cosmic-input {
   background: linear-gradient(90deg, transparent, rgba(111, 227, 255, 0.35), transparent);
 }
 
-.cosmic-footer .logo img {
-  height: 38px;
-  margin: 0 auto 28px;
-  display: inline-block;
+/* Stand-in for the component's FooterBackgroundGradient — two soft nebula
+   pools, no animation cost. */
+.cosmic-footer-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 18% 100%, rgba(58, 107, 255, 0.1), transparent 70%),
+    radial-gradient(50% 45% at 85% 90%, rgba(124, 92, 255, 0.08), transparent 70%);
+}
+
+.cosmic-footer-inner {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.cosmic-footer-grid {
+  display: grid;
+  grid-template-columns: 1.9fr 1fr 1fr 1fr 1.3fr;
+  gap: 48px 36px;
+}
+
+.cosmic-footer-brand .logo img {
+  height: 32px;
+  display: block;
   opacity: 0.9;
 }
 
-.cosmic-footer p {
+.cosmic-footer-brand p {
+  margin: 22px 0 0;
+  max-width: 320px;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  line-height: 1.85;
+  color: var(--haze);
+}
+
+.cosmic-footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 7px 14px;
+  border: 1px dashed var(--cosmic-dash);
+  border-radius: 9999px;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-footer-badge .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--aurora-cyan);
+  animation: cosmicPulse 1.6s ease infinite;
+}
+
+.cosmic-footer-col h4 {
+  margin: 0 0 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--star-white);
+}
+
+.cosmic-footer-col a {
+  display: block;
+  margin-bottom: 13px;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: var(--haze-soft);
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.cosmic-footer-col a:hover {
+  color: var(--aurora-cyan);
+  transform: translateX(2px);
+}
+
+.cosmic-footer-connect ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cosmic-footer-connect li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: var(--haze-soft);
+}
+
+.cosmic-footer-connect li svg {
+  flex-shrink: 0;
+  color: #8fb3ff;
+}
+
+.cosmic-footer-connect li a {
+  display: inline;
+  margin: 0;
+}
+
+.cosmic-footer-divider {
+  height: 1px;
+  margin-top: 64px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cosmic-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 28px;
+  padding: 26px 0;
+}
+
+.cosmic-footer-bottom p {
   margin: 0;
   font-size: 11px;
   letter-spacing: 0.24em;
@@ -861,14 +1136,75 @@ textarea.cosmic-input {
   color: var(--haze-soft);
 }
 
-.cosmic-footer a {
+.cosmic-footer-bottom a {
   color: var(--haze);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-.cosmic-footer a:hover {
+.cosmic-footer-bottom a:hover {
   color: var(--aurora-cyan);
+}
+
+.cosmic-footer-bottom .sep {
+  margin: 0 10px;
+  color: var(--haze-soft);
+}
+
+/* Giant hover-lit wordmark. The SVG scales with the column; stroke-only
+   text keeps it quiet until the cursor ignites the gradient. */
+.cosmic-footer-hovertext {
+  padding: 20px 0 28px;
+}
+
+.cosmic-footer-hovertext svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.thv-text {
+  font-size: 84px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  fill: transparent;
+  stroke-width: 1;
+}
+
+.thv-text--base {
+  stroke: rgba(244, 246, 255, 0.14);
+}
+
+.thv-text--gradient {
+  opacity: 0;
+  stroke-width: 1.1;
+  transition: opacity 0.35s ease;
+}
+
+.thv-text--gradient.is-lit {
+  opacity: 1;
+}
+
+@media (max-width: 1024px) {
+  .cosmic-footer-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .cosmic-footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .cosmic-footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 24px;
+  }
+
+  .cosmic-footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 /* --- Header CTA (replaces the personal social row) --- */

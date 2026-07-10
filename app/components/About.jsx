@@ -32,7 +32,7 @@ const About = () => {
       <div className="cosmic-section-inner">
         <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
           <AnimatedContainer>
-            <span className="cosmic-eyebrow">The Studio</span>
+            <span className="cosmic-eyebrow">The Firm</span>
             <h2 className="cosmic-title">
               Maps, Metrics,
               <br />
@@ -40,23 +40,27 @@ const About = () => {
             </h2>
             <div className="cosmic-line" />
             <p className="cosmic-desc">
-              byZenterra is a studio built on the belief that geospatial technology can transform
-              how organizations work. We combine custom tool development with deep expertise in
-              GIS, data analytics, and web development to streamline processes, enhance
-              efficiency, and move spatial data management forward for the teams we serve.
+              byZenterra is a DTI-registered, Filipino-grown firm advancing GIS and spatial data
+              infrastructure. We deliver end-to-end digital mapping solutions — the backbone for
+              modern governance and private-sector innovation across the Philippines — pairing
+              fieldwork-grade GIS discipline with data analytics and modern web engineering.
             </p>
 
             <div className="mt-12 flex flex-wrap items-end gap-10">
               <div>
-                <div className="cosmic-stat-number">6+</div>
-                <div className="cosmic-stat-label">Years in the Field</div>
+                <div className="cosmic-stat-number">10</div>
+                <div className="cosmic-stat-label">Years in Geospatial</div>
+              </div>
+              <div>
+                <div className="cosmic-stat-number">2</div>
+                <div className="cosmic-stat-label">Years in AI</div>
               </div>
               <div className="flex flex-wrap gap-4">
-                <HudButton variant="secondary" href="/what-we-do">
-                  What We Do
+                <HudButton variant="secondary" href="/our-work">
+                  Our Work
                 </HudButton>
-                <HudButton variant="secondary" href="/who-we-are">
-                  Who We Are
+                <HudButton variant="secondary" href="/about/mission">
+                  About Us
                 </HudButton>
               </div>
             </div>

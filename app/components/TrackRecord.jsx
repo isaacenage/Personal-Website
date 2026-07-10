@@ -47,8 +47,9 @@ const TrackRecord = () => (
         </h2>
         <div className="cosmic-line" />
         <p className="cosmic-desc">
-          byZenterra grows out of years delivering GIS, data analytics, and web solutions for
-          leaders in Philippine real estate, energy, and telecommunications.
+          Ten years delivering GIS, data analytics, and web solutions for leaders in
+          Philippine real estate, energy, and telecommunications, plus two years leading AI
+          development — the field experience byZenterra is built on.
         </p>
       </AnimatedContainer>
 

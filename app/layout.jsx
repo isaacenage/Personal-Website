@@ -21,8 +21,8 @@ export const viewport = {
 }
 
 export const metadata = {
-  title: 'byZenterra — Geospatial, Analytics & Web Studio',
-  description: 'byZenterra is a creative technology studio building interactive web maps, decision-ready dashboards, and modern web applications. We turn spatial data, analytics, and code into products your team can act on.',
+  title: 'byZenterra — GIS & Spatial Data Infrastructure',
+  description: 'byZenterra is a DTI-registered, Filipino-grown firm advancing GIS and spatial data infrastructure — end-to-end digital mapping solutions serving modern governance and private-sector innovation across the Philippines.',
   icons: {
     icon: '/assets/images/logo/byzenterra-icon.svg',
   },

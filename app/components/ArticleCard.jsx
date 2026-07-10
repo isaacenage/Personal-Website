@@ -1,12 +1,12 @@
 import Link from 'next/link'
-import { formatInsightDate } from '@/lib/insights'
+import { formatPostDate } from '@/lib/blog'
 
-/* Index/teaser card for one Insights article. */
+/* Index/teaser card for one blog post. */
 const ArticleCard = ({ article }) => (
-  <Link href={`/insights/${article.slug}`} className="cosmic-insight-card p-6 md:p-8">
+  <Link href={`/blogs/${article.slug}`} className="cosmic-insight-card p-6 md:p-8">
     <div className="top">
       <span className="category">{article.category}</span>
-      <span className="date">{formatInsightDate(article.date)}</span>
+      <span className="date">{formatPostDate(article.date)}</span>
     </div>
     <h3 className="title">{article.title}</h3>
     <p className="excerpt">{article.excerpt}</p>

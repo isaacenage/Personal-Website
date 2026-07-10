@@ -1,16 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ChevronDown } from 'lucide-react'
 import { HudButton } from '@/components/ui/hud-button'
 
 const NAV_ITEMS = [
   { href: '/', label: 'Home' },
-  { href: '/what-we-do', label: 'What We Do' },
-  { href: '/who-we-are', label: 'Who We Are' },
-  { href: '/insights', label: 'Insights' },
+  {
+    label: 'About Us',
+    children: [
+      { href: '/about/mission', label: 'Our Mission' },
+      { href: '/about/values', label: 'Our Values' },
+      { href: '/about/leaders', label: 'Our Leaders' },
+    ],
+  },
+  {
+    label: 'Get Involved',
+    children: [
+      { href: '/get-involved/support', label: 'Support Us' },
+      { href: '/get-involved/services', label: 'Get Our Service' },
+    ],
+  },
+  { href: '/our-work', label: 'Our Work' },
+  { href: '/blogs', label: 'Blogs' },
 ]
+
+const CTA_HREF = '/get-involved/services/#contacts'
 
 // trailingSlash is on in next.config.js, so normalize before comparing.
 const isActive = (pathname, href) => {
@@ -19,11 +36,29 @@ const isActive = (pathname, href) => {
   return current === href || current.startsWith(`${href}/`)
 }
 
+const isGroupActive = (pathname, item) =>
+  item.children.some((child) => isActive(pathname, child.href))
+
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [openGroup, setOpenGroup] = useState(null)
   const pathname = usePathname()
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false)
+
+  // Route change closes whatever is open; Escape closes the dropdown.
+  useEffect(() => {
+    setOpenGroup(null)
+    setIsMobileMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setOpenGroup(null)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <>
@@ -33,18 +68,59 @@ const Header = () => {
         </Link>
 
         <nav className="cosmic-nav" aria-label="Main navigation">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={isActive(pathname, item.href) ? 'active' : ''}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV_ITEMS.map((item) =>
+            item.children ? (
+              <div
+                key={item.label}
+                className={`cosmic-nav-group ${openGroup === item.label ? 'open' : ''}`}
+                onMouseEnter={() => setOpenGroup(item.label)}
+                onMouseLeave={() =>
+                  setOpenGroup((group) => (group === item.label ? null : group))
+                }
+              >
+                <button
+                  type="button"
+                  className={`cosmic-nav-trigger ${
+                    isGroupActive(pathname, item) ? 'active' : ''
+                  }`}
+                  aria-expanded={openGroup === item.label}
+                  aria-haspopup="true"
+                  onClick={() =>
+                    setOpenGroup((group) => (group === item.label ? null : item.label))
+                  }
+                >
+                  {item.label}
+                  <ChevronDown size={12} strokeWidth={1.5} aria-hidden />
+                </button>
+
+                <div className="cosmic-dropdown">
+                  <div className="cosmic-dropdown-panel">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className={isActive(pathname, child.href) ? 'active' : ''}
+                        onClick={() => setOpenGroup(null)}
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={isActive(pathname, item.href) ? 'active' : ''}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
         </nav>
 
-        <HudButton href="/#contacts" variant="secondary" className="cosmic-header-cta">
+        <HudButton href={CTA_HREF} variant="secondary" className="cosmic-header-cta">
           Start a Project
         </HudButton>
 
@@ -64,14 +140,25 @@ const Header = () => {
           <i className="fa-sharp fa-light fa-xmark"></i>
         </button>
 
-        {NAV_ITEMS.map((item) => (
-          <Link key={item.href} href={item.href} onClick={closeMobileMenu}>
-            {item.label}
-          </Link>
-        ))}
+        {NAV_ITEMS.map((item) =>
+          item.children ? (
+            <div key={item.label} className="cosmic-mobile-group">
+              <span className="cosmic-mobile-group-label">{item.label}</span>
+              {item.children.map((child) => (
+                <Link key={child.href} href={child.href} onClick={closeMobileMenu}>
+                  {child.label}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <Link key={item.href} href={item.href} onClick={closeMobileMenu}>
+              {item.label}
+            </Link>
+          )
+        )}
 
         <HudButton
-          href="/#contacts"
+          href={CTA_HREF}
           variant="secondary"
           className="cosmic-header-cta"
           onClick={closeMobileMenu}
