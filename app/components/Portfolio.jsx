@@ -1,8 +1,21 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { AnimatedContainer } from '@/components/ui/animated-container'
 import { HudButton } from '@/components/ui/hud-button'
+
+/* three/R3F only load when the homepage chunk needs them; the placeholder
+   matches the gallery height so the section doesn't shift when it mounts */
+const StellarWorkGallery = dynamic(
+  () => import('@/components/ui/3d-image-gallery').then((m) => m.StellarWorkGallery),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="cosmic-grid-frame" style={{ height: 'clamp(480px, 72vh, 660px)' }} />
+    ),
+  }
+)
 
 const TABS = [
   { key: 'maps', label: 'Maps' },
@@ -155,32 +168,12 @@ const Portfolio = () => {
           </div>
         </AnimatedContainer>
 
-        <AnimatedContainer
-          delay={0.4}
-          className="grid grid-cols-1 divide-x divide-y divide-dashed divide-white/10 cosmic-grid-frame sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {portfolioData[activeTab].map((item) => (
-            <a
-              key={`${activeTab}-${item.id}`}
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cosmic-portfolio-card p-5 md:p-6"
-            >
-              <div className="thumb">
-                <img src={item.image} alt={item.title} loading="lazy" decoding="async" />
-              </div>
-              <div className="meta">
-                <div>
-                  <div className="category">{item.category}</div>
-                  <h3 className="title">{item.title}</h3>
-                </div>
-                <span className="arrow" aria-hidden="true">
-                  <i className="fa-solid fa-arrow-up-right"></i>
-                </span>
-              </div>
-            </a>
-          ))}
+        <AnimatedContainer delay={0.4}>
+          <StellarWorkGallery
+            key={activeTab}
+            items={portfolioData[activeTab]}
+            className="cosmic-grid-frame"
+          />
         </AnimatedContainer>
       </div>
     </section>

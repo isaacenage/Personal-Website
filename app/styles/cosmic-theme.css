@@ -112,15 +112,86 @@ body {
   color: var(--haze-soft);
 }
 
+/* Slide-glow treatment (21st.dev "slide glow button", recolored to the
+   aurora cyan): resting text is dimmed with a glowing bar at its left
+   edge; on hover the bar sweeps right and reveals the neon fill behind
+   it. The fill is painted with background-clip: text so the reveal edge
+   and the bar share one transition and stay in sync. The hero titles
+   (BYZENTERRA / EXPLORE / CREATE) use .hero-title and are unaffected. */
 .cosmic-title {
+  position: relative;
+  width: fit-content;
   margin: 18px 0 0;
   font-size: clamp(1.9rem, 4.5vw, 3.25rem);
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1.15;
-  color: var(--star-white);
-  text-shadow: 0 0 60px rgba(80, 120, 255, 0.35);
+  color: rgba(244, 246, 255, 0.4);
+  -webkit-text-stroke: 1px rgba(230, 240, 255, 0.14);
+  filter: drop-shadow(0 0 16px rgba(111, 227, 255, 0));
+  transition:
+    background-position 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .cosmic-title {
+    /* Left half neon, right half dim; a 200% background slides one half
+       into view. 200.5% hides the neon seam at the left edge at rest. */
+    background-image: linear-gradient(
+      90deg,
+      #b7efff 0%,
+      var(--aurora-cyan) 50%,
+      rgba(244, 246, 255, 0.4) 50%,
+      rgba(244, 246, 255, 0.4) 100%
+    );
+    background-size: 200.5% 100%;
+    background-position: 100% 0;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.cosmic-title::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0.09em;
+  height: calc(100% + 0.2em);
+  transform: translate(-0.16em, -50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #c8f4ff, var(--aurora-cyan));
+  box-shadow:
+    0 0 6px rgba(111, 227, 255, 0.95),
+    0 0 18px rgba(111, 227, 255, 0.6),
+    0 0 44px rgba(58, 107, 255, 0.55);
+  transition: left 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cosmic-title:hover {
+  background-position: 0 0;
+  filter: drop-shadow(0 0 16px rgba(111, 227, 255, 0.45));
+}
+
+.cosmic-title:hover::after {
+  left: 100%;
+}
+
+/* No hover on touch: keep the revealed, glowing state so titles never
+   read as permanently dimmed. */
+@media (hover: none) {
+  .cosmic-title {
+    background-position: 0 0;
+    filter: drop-shadow(0 0 16px rgba(111, 227, 255, 0.35));
+  }
+
+  .cosmic-title::after {
+    left: 100%;
+  }
 }
 
 .cosmic-line {
@@ -145,6 +216,7 @@ body {
   text-align: center;
 }
 
+.cosmic-head--center .cosmic-title,
 .cosmic-head--center .cosmic-line,
 .cosmic-head--center .cosmic-desc {
   margin-left: auto;
@@ -966,6 +1038,11 @@ textarea.cosmic-input {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cosmic-title,
+  .cosmic-title::after {
+    transition: none;
+  }
+
   .cosmic-pricing .accent-lines .hline,
   .cosmic-pricing .accent-lines .vline {
     transform: none;
