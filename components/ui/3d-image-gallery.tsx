@@ -432,7 +432,9 @@ export function StellarWorkGallery({
     <div
       ref={wrapRef}
       className={className}
-      style={{ position: 'relative', height: 'clamp(480px, 72vh, 660px)', overflow: 'hidden' }}
+      /* sizing belongs to the parent — the Our Work stage stretches this to
+         the full viewport */
+      style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}
     >
       <Canvas
         camera={{ position: [0, 0, 16], fov: 55 }}

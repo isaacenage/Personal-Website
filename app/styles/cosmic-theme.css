@@ -432,6 +432,45 @@ body {
   background: rgba(111, 227, 255, 0.06);
 }
 
+/* Category filter items are <button>s — mirror the link styling, plus a
+   reset because the template CSS stretches bare buttons to 100%. */
+.cosmic-dropdown-panel button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  padding: 11px 22px;
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+  white-space: nowrap;
+  transition: color 0.3s ease, background 0.3s ease;
+}
+
+.cosmic-dropdown-panel button:hover,
+.cosmic-dropdown-panel button.active {
+  color: #fff;
+  background: rgba(111, 227, 255, 0.06);
+}
+
+/* Right-edge variant for the header's Category filter: the panel hugs the
+   viewport edge instead of centering under (and past) the trigger. */
+.cosmic-dropdown--right {
+  left: auto;
+  right: 0;
+  transform: translate(0, 8px);
+}
+
+.cosmic-nav-group.open .cosmic-dropdown--right,
+.cosmic-nav-group:focus-within .cosmic-dropdown--right {
+  transform: translate(0, 0);
+}
+
 .cosmic-socials {
   display: flex;
   align-items: center;
@@ -558,6 +597,28 @@ body {
   padding: 10px 14px;
 }
 
+/* Category buttons in the mobile overlay (Our Work page): match the group
+   links, with the template's bare-button stretching reset. */
+.cosmic-mobile-group button {
+  width: auto;
+  margin: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--haze);
+  padding: 10px 14px;
+  transition: color 0.3s ease;
+}
+
+.cosmic-mobile-group button:hover,
+.cosmic-mobile-group button.active {
+  color: #fff;
+}
+
 @media (max-width: 1199px) {
   .cosmic-header {
     padding: 20px 24px;
@@ -568,7 +629,8 @@ body {
 
   .cosmic-nav,
   .cosmic-header > .cosmic-socials,
-  .cosmic-header > .cosmic-header-cta {
+  .cosmic-header > .cosmic-header-cta,
+  .cosmic-header > .cosmic-filter-group {
     display: none;
   }
 
@@ -1219,6 +1281,15 @@ textarea.cosmic-input {
   padding-top: 200px;
 }
 
+/* --- Our Work: fullscreen gallery stage --- */
+.cosmic-work-stage {
+  position: relative;
+  height: 100vh;
+  /* dvh where supported: tracks the collapsing mobile browser chrome */
+  height: 100dvh;
+  overflow: hidden;
+}
+
 /* --- Insights: index/teaser cards --- */
 .cosmic-insight-card {
   display: flex;
@@ -1389,6 +1460,7 @@ textarea.cosmic-input {
   .cosmic-page-hero {
     padding-top: 150px;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {

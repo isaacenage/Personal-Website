@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
 import { HudButton } from '@/components/ui/hud-button'
+import { WORK_CATEGORIES, setWorkCategory, useWorkCategory } from './work-category'
 
 const NAV_ITEMS = [
   { href: '/', label: 'Home' },
@@ -43,6 +44,10 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [openGroup, setOpenGroup] = useState(null)
   const pathname = usePathname()
+
+  /* On Our Work the header CTA slot holds the gallery category filter. */
+  const onWorkPage = isActive(pathname, '/our-work')
+  const activeCategory = useWorkCategory()
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false)
 
@@ -120,9 +125,52 @@ const Header = () => {
           )}
         </nav>
 
-        <HudButton href={CTA_HREF} variant="secondary" className="cosmic-header-cta">
-          Start a Project
-        </HudButton>
+        {onWorkPage ? (
+          <div
+            className={`cosmic-nav-group cosmic-filter-group ${
+              openGroup === 'Category' ? 'open' : ''
+            }`}
+            onMouseEnter={() => setOpenGroup('Category')}
+            onMouseLeave={() =>
+              setOpenGroup((group) => (group === 'Category' ? null : group))
+            }
+          >
+            <HudButton
+              variant="secondary"
+              className="cosmic-header-cta"
+              aria-expanded={openGroup === 'Category'}
+              aria-haspopup="true"
+              onClick={() =>
+                setOpenGroup((group) => (group === 'Category' ? null : 'Category'))
+              }
+            >
+              Category
+            </HudButton>
+
+            <div className="cosmic-dropdown cosmic-dropdown--right">
+              <div className="cosmic-dropdown-panel">
+                {WORK_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    className={activeCategory === cat.key ? 'active' : ''}
+                    aria-pressed={activeCategory === cat.key}
+                    onClick={() => {
+                      setWorkCategory(cat.key)
+                      setOpenGroup(null)
+                    }}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <HudButton href={CTA_HREF} variant="secondary" className="cosmic-header-cta">
+            Start a Project
+          </HudButton>
+        )}
 
         <button
           className="cosmic-mobile-toggle"
@@ -155,6 +203,26 @@ const Header = () => {
               {item.label}
             </Link>
           )
+        )}
+
+        {onWorkPage && (
+          <div className="cosmic-mobile-group">
+            <span className="cosmic-mobile-group-label">Category</span>
+            {WORK_CATEGORIES.map((cat) => (
+              <button
+                key={cat.key}
+                type="button"
+                className={activeCategory === cat.key ? 'active' : ''}
+                aria-pressed={activeCategory === cat.key}
+                onClick={() => {
+                  setWorkCategory(cat.key)
+                  closeMobileMenu()
+                }}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
         )}
 
         <HudButton

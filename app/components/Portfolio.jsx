@@ -1,28 +1,17 @@
 'use client'
 
-import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { AnimatedContainer } from '@/components/ui/animated-container'
-import { HudButton } from '@/components/ui/hud-button'
+import { useWorkCategory } from './work-category'
 
-/* three/R3F only load when the homepage chunk needs them; the placeholder
-   matches the gallery height so the section doesn't shift when it mounts */
+/* three/R3F only load when this page's chunk needs them; the placeholder
+   fills the fullscreen stage so nothing shifts when the canvas mounts */
 const StellarWorkGallery = dynamic(
   () => import('@/components/ui/3d-image-gallery').then((m) => m.StellarWorkGallery),
   {
     ssr: false,
-    loading: () => (
-      <div className="cosmic-grid-frame" style={{ height: 'clamp(480px, 72vh, 660px)' }} />
-    ),
+    loading: () => <div style={{ height: '100%' }} />,
   }
 )
-
-const TABS = [
-  { key: 'maps', label: 'Maps' },
-  { key: 'websites', label: 'Websites' },
-  { key: 'tools', label: 'Tools' },
-  { key: 'analytics', label: 'Analytics' },
-]
 
 const portfolioData = {
   maps: [
@@ -53,6 +42,27 @@ const portfolioData = {
       category: 'Demo WebGIS Application',
       image: '/assets/images/latest-portfolio/bddrrmis.webp',
       link: '/Portfolio/bddrmis',
+    },
+    {
+      id: 5,
+      title: 'Anu Na, Meralco?',
+      category: 'Live Brownout Map',
+      image: '/assets/images/latest-portfolio/anunameralco.jpg',
+      link: 'https://anunameralco.byzenterra.org',
+    },
+    {
+      id: 6,
+      title: 'Impeach Sara Duterte',
+      category: 'Provincial Signature Map',
+      image: '/assets/images/latest-portfolio/impeachsara.jpg',
+      link: 'https://impeachsara.byzenterra.org',
+    },
+    {
+      id: 7,
+      title: 'War on Drugs',
+      category: 'EJK Dashboard',
+      image: '/assets/images/latest-portfolio/ejkmap.jpg',
+      link: 'https://warondrugs.byzenterra.org',
     },
   ],
   websites: [
@@ -98,6 +108,27 @@ const portfolioData = {
       image: '/assets/images/latest-portfolio/AeraLink.webp',
       link: '/Portfolio/AeraLink',
     },
+    {
+      id: 7,
+      title: 'The Arcade Gazette',
+      category: 'Browser Games',
+      image: '/assets/images/latest-portfolio/arcadegazette.jpg',
+      link: 'https://games.byzenterra.org',
+    },
+    {
+      id: 8,
+      title: 'Andrea & Isaac',
+      category: 'Wedding Invitation',
+      image: '/assets/images/latest-portfolio/invitation.jpg',
+      link: 'https://invitation.byzenterra.org',
+    },
+    {
+      id: 9,
+      title: 'byZenterra Portfolio',
+      category: 'GIS Portfolio',
+      image: '/assets/images/latest-portfolio/zenterraportfolio.jpg',
+      link: 'https://portfolio.byzenterra.org',
+    },
   ],
   tools: [
     {
@@ -106,6 +137,27 @@ const portfolioData = {
       category: 'Tools',
       image: '/assets/images/latest-portfolio/tpph.webp',
       link: '/Tools/titleplotterph',
+    },
+    {
+      id: 2,
+      title: 'PH Geospatial Downloader',
+      category: 'Open Geodata Tool',
+      image: '/assets/images/latest-portfolio/geodata.jpg',
+      link: 'https://gis.byzenterra.org',
+    },
+    {
+      id: 3,
+      title: 'QGIS Plugins',
+      category: 'Open-Source Plugins',
+      image: '/assets/images/latest-portfolio/qgisplugins.jpg',
+      link: 'https://qgis.byzenterra.org',
+    },
+    {
+      id: 4,
+      title: 'Text2Logo',
+      category: 'Logo Design Tool',
+      image: '/assets/images/latest-portfolio/text2logo.jpg',
+      link: 'https://textlogo.byzenterra.org',
     },
   ],
   analytics: [
@@ -127,41 +179,14 @@ const portfolioData = {
 }
 
 const Portfolio = () => {
-  const [activeTab, setActiveTab] = useState('maps')
+  /* driven by the Category dropdown in the header (see work-category.js) */
+  const activeCategory = useWorkCategory()
 
   return (
-    <section className="cosmic-section pt-0" id="portfolio">
-      <div className="cosmic-section-inner space-y-12">
-        <AnimatedContainer delay={0.25}>
-          <div
-            className="flex flex-wrap justify-center gap-4"
-            role="tablist"
-            aria-label="Portfolio categories"
-          >
-            {TABS.map((tab) => (
-              <HudButton
-                key={tab.key}
-                role="tab"
-                aria-selected={activeTab === tab.key}
-                hudStyle="style2"
-                size="small"
-                variant={activeTab === tab.key ? 'primary' : 'secondary'}
-                onClick={() => setActiveTab(tab.key)}
-              >
-                {tab.label}
-              </HudButton>
-            ))}
-          </div>
-        </AnimatedContainer>
-
-        <AnimatedContainer delay={0.4}>
-          <StellarWorkGallery
-            key={activeTab}
-            items={portfolioData[activeTab]}
-            className="cosmic-grid-frame"
-          />
-        </AnimatedContainer>
-      </div>
+    /* fullscreen stage: the gallery fills the viewport and the fixed header
+       (z 100) floats above it */
+    <section className="cosmic-work-stage" id="portfolio">
+      <StellarWorkGallery key={activeCategory} items={portfolioData[activeCategory]} />
     </section>
   )
 }
