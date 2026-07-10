@@ -1,0 +1,980 @@
+/* ===== byZenterra cosmic theme =====
+   Extends the horizon hero's visual system (app/styles/horizon-hero.css)
+   across the entire site. Loaded after globals.css so it wins over the
+   legacy template variables. */
+
+/* No CSS scroll-behavior: smooth here — Lenis
+   (app/components/SmoothScroll.jsx) owns smooth scrolling and the two
+   mechanisms fight over programmatic scrolls. */
+
+:root {
+  --cosmos-black: #000;
+  --cosmos-ink: #05070f;
+  --star-white: #f4f6ff;
+  --haze-strong: rgba(255, 255, 255, 0.75);
+  --haze: rgba(255, 255, 255, 0.6);
+  --haze-soft: rgba(255, 255, 255, 0.45);
+  --horizon-blue: #3a6bff;
+  --aurora-cyan: #6fe3ff;
+  --nebula-violet: #7c5cff;
+  --cosmic-border: rgba(255, 255, 255, 0.12);
+  --cosmic-dash: rgba(255, 255, 255, 0.14);
+  --cosmic-gradient: linear-gradient(90deg, var(--horizon-blue), var(--aurora-cyan));
+
+  /* Retire the template's red accent everywhere it still leaks through
+     (buttons, glows, links from the legacy stylesheet). */
+  --color-primary: var(--horizon-blue);
+  --color-primary-alt: rgba(58, 107, 255, 0.85);
+  --gradient-box: var(--cosmic-gradient);
+  --color-gray-2: var(--cosmos-ink);
+  --color-border: var(--cosmic-border);
+}
+
+body {
+  background: var(--cosmos-black) !important;
+  color: var(--haze);
+}
+
+/* --- Starfield backdrop: the journey continues below the hero --- */
+.cosmic-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 50% at 50% 112%, rgba(15, 52, 96, 0.4), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% -10%, rgba(124, 92, 255, 0.07), transparent 60%);
+}
+
+.cosmic-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(1px 1px at 25px 35px, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 110px 90px, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 190px 45px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 70px 160px, rgba(200, 215, 255, 0.6), transparent),
+    radial-gradient(1.5px 1.5px at 150px 200px, rgba(255, 240, 220, 0.5), transparent),
+    radial-gradient(1px 1px at 230px 140px, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 260px 240px;
+  background-repeat: repeat;
+}
+
+/* Rotating wireframe globe. Rendered inside the hero stage so it paints
+   above the hero's WebGL canvas (z auto) but below its copy (z 5+), while
+   position: fixed keeps the single instance covering the viewport for the
+   whole page. Dimming is done with layer opacity — the canvas is already
+   its own compositor layer, so this is free, unlike an extra overlay div. */
+.globe-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+.cosmic-main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Everything after the hero must out-paint the fixed globe layer, which
+   lives inside the hero stage's stacking context (z 1 within .cosmic-main). */
+.cosmic-main > :not(#home) {
+  position: relative;
+  z-index: 2;
+}
+
+/* Dashed frame for divided card grids. A dedicated class because the
+   template still loads Bootstrap, whose `.border` utility overrides
+   Tailwind's `border` class with !important. */
+.cosmic-grid-frame {
+  border: 1px dashed var(--cosmic-dash);
+}
+
+/* --- Section scaffolding --- */
+.cosmic-section {
+  position: relative;
+  padding: 120px 24px;
+}
+
+.cosmic-section-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.cosmic-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-title {
+  margin: 18px 0 0;
+  font-size: clamp(1.9rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: var(--star-white);
+  text-shadow: 0 0 60px rgba(80, 120, 255, 0.35);
+}
+
+.cosmic-line {
+  width: 160px;
+  height: 2px;
+  margin-top: 26px;
+  border-radius: 2px;
+  background: var(--cosmic-gradient);
+}
+
+.cosmic-desc {
+  margin: 26px 0 0;
+  font-size: clamp(1rem, 1.6vw, 1.1rem);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  line-height: 1.85;
+  color: var(--haze);
+  max-width: 640px;
+}
+
+.cosmic-head--center {
+  text-align: center;
+}
+
+.cosmic-head--center .cosmic-line,
+.cosmic-head--center .cosmic-desc {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Floating header: no container, just text and buttons in space --- */
+.cosmic-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 26px 40px;
+  pointer-events: none;
+}
+
+/* Readability scrim only — fades to nothing, not a box. */
+.cosmic-header::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0 -40px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent);
+  pointer-events: none;
+}
+
+.cosmic-header > * {
+  position: relative;
+  pointer-events: auto;
+}
+
+.cosmic-header .cosmic-logo img {
+  height: 34px;
+  display: block;
+}
+
+.cosmic-nav {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.cosmic-nav a {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 6px;
+  transition: color 0.3s ease;
+}
+
+.cosmic-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: var(--cosmic-gradient);
+  transition: transform 0.3s ease;
+}
+
+.cosmic-nav a:hover,
+.cosmic-nav a.active {
+  color: #fff;
+}
+
+.cosmic-nav a:hover::after,
+.cosmic-nav a.active::after {
+  transform: scaleX(1);
+}
+
+.cosmic-socials {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.cosmic-socials a {
+  color: var(--haze-soft);
+  font-size: 15px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.cosmic-socials a:hover {
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.cosmic-mobile-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.cosmic-mobile-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.75);
+  transition: background 0.3s ease;
+}
+
+.cosmic-mobile-toggle:hover span {
+  background: #fff;
+}
+
+.cosmic-mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  /* Near-opaque solid instead of backdrop-filter: at 0.92 alpha the blur
+     was invisible but re-blurred the page every frame of the open/close
+     fade — the single worst effect for low-end GPUs. */
+  background: rgba(0, 0, 0, 0.97);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.cosmic-mobile-menu.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.cosmic-mobile-menu a {
+  font-size: 15px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--haze);
+  text-decoration: none;
+  padding: 14px;
+  transition: color 0.3s ease;
+}
+
+.cosmic-mobile-menu a:hover {
+  color: #fff;
+}
+
+.cosmic-mobile-close {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  background: none;
+  border: 0;
+  color: var(--haze);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.3s ease;
+}
+
+.cosmic-mobile-close:hover {
+  color: #fff;
+}
+
+.cosmic-mobile-menu .cosmic-header-cta {
+  margin-top: 32px;
+}
+
+@media (max-width: 1199px) {
+  .cosmic-header {
+    padding: 20px 24px;
+  }
+
+  .cosmic-nav,
+  .cosmic-header > .cosmic-socials,
+  .cosmic-header > .cosmic-header-cta {
+    display: none;
+  }
+
+  .cosmic-mobile-toggle {
+    display: flex;
+  }
+}
+
+/* Buttons live in hud-button.css (.hud-btn — the 21st.dev HUD button). */
+
+/* --- About stat --- */
+.cosmic-stat-number {
+  font-size: clamp(3.5rem, 7vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 60px rgba(80, 120, 255, 0.35);
+}
+
+.cosmic-stat-label {
+  margin-top: 12px;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+/* --- Portfolio --- */
+.cosmic-portfolio-card {
+  position: relative;
+  display: block;
+  text-decoration: none;
+}
+
+.cosmic-portfolio-card .thumb {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  aspect-ratio: 16 / 10;
+  background: var(--cosmos-ink);
+}
+
+.cosmic-portfolio-card .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.85) brightness(0.9);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease;
+}
+
+.cosmic-portfolio-card:hover .thumb img {
+  transform: scale(1.045);
+  filter: saturate(1) brightness(1);
+}
+
+.cosmic-portfolio-card .meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cosmic-portfolio-card .category {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-portfolio-card .title {
+  margin: 6px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.cosmic-portfolio-card .arrow {
+  color: var(--haze-soft);
+  font-size: 14px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.cosmic-portfolio-card:hover .arrow {
+  color: var(--aurora-cyan);
+  transform: translate(2px, -2px);
+}
+
+/* --- Pricing (pricing-three-plans, recolored for the cosmos) --- */
+.cosmic-pricing {
+  position: relative;
+  overflow: hidden;
+}
+
+.cosmic-pricing .vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(80% 60% at 50% 12%, rgba(111, 227, 255, 0.05), transparent 60%);
+}
+
+.cosmic-pricing .accent-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.cosmic-pricing .accent-lines .hline,
+.cosmic-pricing .accent-lines .vline {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.07);
+  animation-fill-mode: forwards;
+}
+
+.cosmic-pricing .accent-lines .hline {
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: 50% 50%;
+}
+
+.cosmic-pricing .accent-lines .vline {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: scaleY(0);
+  transform-origin: 50% 0%;
+}
+
+.cosmic-pricing.is-ready .accent-lines .hline:nth-of-type(1) { top: 18%; animation: cosmicDrawX 0.6s ease 0.08s forwards; }
+.cosmic-pricing.is-ready .accent-lines .hline:nth-of-type(2) { top: 50%; animation: cosmicDrawX 0.6s ease 0.16s forwards; }
+.cosmic-pricing.is-ready .accent-lines .hline:nth-of-type(3) { top: 82%; animation: cosmicDrawX 0.6s ease 0.24s forwards; }
+.cosmic-pricing.is-ready .accent-lines .vline:nth-of-type(1) { left: 18%; animation: cosmicDrawY 0.7s ease 0.2s forwards; }
+.cosmic-pricing.is-ready .accent-lines .vline:nth-of-type(2) { left: 50%; animation: cosmicDrawY 0.7s ease 0.28s forwards; }
+.cosmic-pricing.is-ready .accent-lines .vline:nth-of-type(3) { left: 82%; animation: cosmicDrawY 0.7s ease 0.36s forwards; }
+
+@keyframes cosmicDrawX { to { transform: scaleX(1); } }
+@keyframes cosmicDrawY { to { transform: scaleY(1); } }
+
+.cosmic-pricing .pricing-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.pricing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px;
+  border-radius: 16px;
+  background: rgba(10, 13, 22, 0.72);
+  border: 1px solid var(--cosmic-border);
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.pricing-card--pop {
+  /* backdrop-filter removed: the 0.92-alpha ink background over a dark
+     section already hides what's behind it, so the blur cost frames for
+     no visible effect. */
+  background: rgba(13, 17, 26, 0.94);
+  border-color: rgba(111, 227, 255, 0.35);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45), 0 0 60px rgba(58, 107, 255, 0.12);
+}
+
+.cosmic-pricing.is-ready .pricing-card {
+  animation: cosmicFadeUp 0.6s ease forwards;
+}
+
+@keyframes cosmicFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pricing-chip {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid rgba(111, 227, 255, 0.35);
+  background: rgba(8, 12, 22, 0.85);
+  color: #e6ecff;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  box-shadow: 0 0 24px rgba(58, 107, 255, 0.25);
+}
+
+.pricing-chip .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--aurora-cyan);
+  animation: cosmicPulse 1.6s ease infinite;
+}
+
+@keyframes cosmicPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.pricing-card .plan-name {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.pricing-card .plan-price {
+  font-size: clamp(1.3rem, 1.8vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--star-white);
+  line-height: 1.3;
+}
+
+.pricing-card .plan-tagline {
+  margin: 12px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.pricing-card .plan-desc {
+  margin: 16px 0 0;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  line-height: 1.7;
+  color: var(--haze);
+}
+
+.pricing-card .plan-features {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  flex: 1;
+}
+
+.pricing-card .plan-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 13.5px;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.pricing-card .plan-features svg {
+  flex-shrink: 0;
+  color: #8fb3ff;
+}
+
+.pricing-card .plan-note {
+  margin: 14px 0 0;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--haze-soft);
+}
+
+/* --- Contact form --- */
+.cosmic-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.cosmic-form .full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .cosmic-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cosmic-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--cosmic-border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.cosmic-input::placeholder {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.cosmic-input:focus {
+  outline: none;
+  border-color: rgba(111, 227, 255, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 1px rgba(111, 227, 255, 0.2), 0 0 30px rgba(58, 107, 255, 0.15);
+}
+
+textarea.cosmic-input {
+  min-height: 170px;
+  resize: vertical;
+}
+
+.cosmic-alert {
+  margin-top: 24px;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+.cosmic-alert--success {
+  border-color: rgba(111, 227, 255, 0.4);
+  color: #bfeaff;
+  background: rgba(58, 107, 255, 0.08);
+}
+
+.cosmic-alert--error {
+  border-color: rgba(255, 176, 32, 0.4);
+  color: #ffd591;
+  background: rgba(255, 176, 32, 0.06);
+}
+
+/* --- Founder / resume extras --- */
+.cosmic-founder-img {
+  border-radius: 14px;
+  border: 1px solid var(--cosmic-border);
+  overflow: hidden;
+  box-shadow: 0 20px 80px rgba(58, 107, 255, 0.12);
+}
+
+.cosmic-founder-img img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: saturate(0.9);
+}
+
+.cosmic-founder-block {
+  padding: 24px 0 0;
+}
+
+.cosmic-founder-block .role {
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-founder-block .name {
+  margin: 12px 0 0;
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--star-white);
+}
+
+.cosmic-founder-block .caption {
+  margin: 6px 0 0;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-founder-block .blurb {
+  margin: 14px 0 0;
+  font-size: 14px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.8;
+  color: var(--haze);
+}
+
+/* --- Footer --- */
+.cosmic-footer {
+  position: relative;
+  padding: 80px 24px 48px;
+  text-align: center;
+}
+
+.cosmic-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(480px, 70vw);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(111, 227, 255, 0.35), transparent);
+}
+
+.cosmic-footer .logo img {
+  height: 38px;
+  margin: 0 auto 28px;
+  display: inline-block;
+  opacity: 0.9;
+}
+
+.cosmic-footer p {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-footer a {
+  color: var(--haze);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.cosmic-footer a:hover {
+  color: var(--aurora-cyan);
+}
+
+/* --- Header CTA (replaces the personal social row) --- */
+.cosmic-header-cta {
+  padding: 10px 18px;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+}
+
+/* --- Sub-page opening block: clears the fixed header (no WebGL hero) --- */
+.cosmic-page-hero {
+  padding-top: 200px;
+}
+
+/* --- Insights: index/teaser cards --- */
+.cosmic-insight-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.cosmic-insight-card .top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cosmic-insight-card .category {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--aurora-cyan);
+}
+
+.cosmic-insight-card .date {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-insight-card .title {
+  margin: 18px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+  color: #fff;
+  transition: color 0.3s ease;
+}
+
+.cosmic-insight-card:hover .title {
+  color: var(--aurora-cyan);
+}
+
+.cosmic-insight-card .excerpt {
+  margin: 14px 0 0;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  line-height: 1.75;
+  color: var(--haze);
+  flex: 1;
+}
+
+.cosmic-insight-card .bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+}
+
+.cosmic-insight-card .read-time {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-insight-card .arrow {
+  color: var(--haze-soft);
+  font-size: 14px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.cosmic-insight-card:hover .arrow {
+  color: var(--aurora-cyan);
+  transform: translate(2px, -2px);
+}
+
+/* --- Insights: article page --- */
+.cosmic-article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin-bottom: 22px;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-article-meta .category {
+  color: var(--aurora-cyan);
+}
+
+.cosmic-article-byline {
+  margin: 22px 0 0;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--haze-soft);
+}
+
+.cosmic-article {
+  margin-top: 48px;
+}
+
+.cosmic-article p {
+  margin: 0 0 26px;
+  font-size: clamp(1rem, 1.5vw, 1.06rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.95;
+  color: var(--haze);
+}
+
+.cosmic-article h2 {
+  margin: 44px 0 20px;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--star-white);
+}
+
+.cosmic-article ul {
+  margin: 0 0 26px;
+  padding-left: 22px;
+  list-style: none;
+}
+
+.cosmic-article ul li {
+  position: relative;
+  margin-bottom: 14px;
+  font-size: clamp(0.95rem, 1.4vw, 1rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1.85;
+  color: var(--haze);
+}
+
+.cosmic-article ul li::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 0.75em;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--cosmic-gradient);
+}
+
+.cosmic-article blockquote {
+  margin: 36px 0;
+  padding: 4px 0 4px 26px;
+  border-left: 2px solid var(--aurora-cyan);
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  line-height: 1.75;
+  color: var(--star-white);
+}
+
+@media (max-width: 768px) {
+  .cosmic-section {
+    padding: 88px 20px;
+  }
+
+  .cosmic-page-hero {
+    padding-top: 150px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cosmic-pricing .accent-lines .hline,
+  .cosmic-pricing .accent-lines .vline {
+    transform: none;
+    animation: none !important;
+  }
+
+  .pricing-card {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+}

@@ -1,10 +1,15 @@
-/* Import existing CSS files */
+/* Import existing CSS files (swiper.css dropped — no swiper on any page) */
 @import url('/assets/css/vendor/fontawesome.css');
-@import url('/assets/css/plugins/swiper.css');
 @import url('/assets/css/plugins/odometer.css');
 @import url('/assets/css/vendor/animate.min.css');
 @import url('/assets/css/vendor/bootstrap.min.css');
 @import url('/assets/css/style.css');
+
+/* Tailwind (preflight disabled in tailwind.config.ts so the template CSS
+   above keeps control of base element styles) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ===== Performance Overrides ===== */
 
@@ -78,5 +83,35 @@
     transform: translate(var(--tx), var(--ty));
     opacity: 0;
   }
+}
+
+/* ===== Lenis smooth scrolling (vendored from lenis/dist/lenis.css) =====
+   Kept here, after the @import chain, instead of imported from
+   SmoothScroll.jsx — see the note in that component. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+.lenis.lenis-autoToggle {
+  transition-property: overflow;
+  transition-duration: 1ms;
+  transition-behavior: allow-discrete;
 }
 

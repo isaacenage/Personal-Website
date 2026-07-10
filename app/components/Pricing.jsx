@@ -1,224 +1,224 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { Check } from 'lucide-react'
+import { HudButton } from '@/components/ui/hud-button'
+
+const tiers = [
+  {
+    name: 'Static Website',
+    price: '₱80,000 – ₱100,000',
+    tagline: 'Basic complexity',
+    description: 'Company profiles, landing pages, portfolios, and blogs.',
+    features: ['HTML/CSS', 'Minimal JavaScript', 'No backend'],
+    highlighted: false,
+  },
+  {
+    name: 'Dynamic Website',
+    price: '₱100,000 – ₱150,000',
+    tagline: 'Intermediate complexity',
+    description: 'CMS websites, dashboards, map viewers, and interactive UI.',
+    features: ['API calls', 'Dynamic UI', 'Data fetching', 'Light backend'],
+    highlighted: true,
+  },
+  {
+    name: 'Web Application',
+    price: '₱150,000 – ₱500,000',
+    tagline: 'Advanced complexity',
+    description: 'SaaS tools, GIS web apps, data dashboards, and management systems.',
+    features: ['Authentication', 'Database integration', 'User roles', 'Complex frontend logic'],
+    highlighted: false,
+  },
+  {
+    name: 'Enterprise System',
+    price: 'Custom Quote',
+    tagline: 'Enterprise complexity',
+    description: 'Enterprise platforms, large SaaS, and high-scale multi-user systems.',
+    features: ['Scalable architecture', 'Microservices', 'Advanced security', 'CI/CD pipelines'],
+    note: 'Depends on scalability of database and cloud — to be discussed with your IT team.',
+    highlighted: false,
+  },
+]
+
 const Pricing = () => {
-  const tiers = [
-    {
-      category: 'Static Website',
-      complexity: 'Basic',
-      examples: ['Company Profile', 'Landing Page', 'Portfolio', 'Blog'],
-      features: ['HTML/CSS', 'Minimal JavaScript', 'No Backend'],
-      price: '₱80,000 - ₱100,000',
-      highlighted: false
-    },
-    {
-      category: 'Dynamic Website',
-      complexity: 'Intermediate',
-      examples: ['CMS Website', 'Dashboard', 'Map Viewer', 'Interactive UI'],
-      features: ['API Calls', 'Dynamic UI', 'Data Fetching', 'Light Backend'],
-      price: '₱100,000 - ₱150,000',
-      highlighted: true
-    },
-    {
-      category: 'Web Application',
-      complexity: 'Advanced',
-      examples: ['SaaS Tools', 'GIS Web Apps', 'Data Dashboards', 'Management Systems'],
-      features: ['Authentication', 'Database Integration', 'User Roles', 'Complex Frontend Logic'],
-      price: '₱150,000 - ₱500,000',
-      highlighted: false
-    },
-    {
-      category: 'Enterprise System',
-      complexity: 'Enterprise',
-      examples: ['Enterprise Platforms', 'Large SaaS', 'High-Scale Multi-User Systems'],
-      features: ['Scalable Architecture', 'Microservices', 'Advanced Security', 'CI/CD Pipelines'],
-      price: 'Custom Quote',
-      note: 'Depends on scalability of database and cloud — to be discussed with IT team',
-      highlighted: false
+  const sectionRef = useRef(null)
+  const canvasRef = useRef(null)
+  const [ready, setReady] = useState(false)
+
+  // Draw the accent lines and fade the cards in once the section scrolls
+  // into view (the original component fired on mount, which wastes the
+  // entrance animation further down the page).
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    // threshold 0: a ratio threshold is unreachable when the stacked-card
+    // section is much taller than the viewport, leaving the cards at
+    // opacity 0 forever.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setReady(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0, rootMargin: '0px 0px -10% 0px' }
+    )
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  // Rising star particles, ported from the pricing-three-plans component.
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx) return
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const setSize = () => {
+      const rect = canvas.parentElement?.getBoundingClientRect()
+      canvas.width = Math.max(1, Math.floor(rect?.width ?? window.innerWidth))
+      canvas.height = Math.max(1, Math.floor(rect?.height ?? window.innerHeight))
     }
-  ]
+    setSize()
 
-  const cardStyle = {
-    background: 'var(--color-gray-2)',
-    borderRadius: '12px',
-    padding: '36px 32px',
-    border: '1px solid var(--color-border)',
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    transition: 'border-color 0.3s ease'
-  }
+    let particles = []
+    let raf = 0
+    let running = false
 
-  const highlightedCardStyle = {
-    ...cardStyle,
-    border: '1px solid var(--color-primary)'
-  }
+    const makeParticle = () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      v: Math.random() * 0.25 + 0.05,
+      o: Math.random() * 0.35 + 0.15,
+    })
+
+    const init = () => {
+      const count = Math.floor((canvas.width * canvas.height) / 12000)
+      particles = Array.from({ length: count }, makeParticle)
+    }
+
+    const draw = () => {
+      if (!running) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      particles.forEach((p) => {
+        p.y -= p.v
+        if (p.y < 0) {
+          p.x = Math.random() * canvas.width
+          p.y = canvas.height + Math.random() * 40
+          p.v = Math.random() * 0.25 + 0.05
+          p.o = Math.random() * 0.35 + 0.15
+        }
+        ctx.fillStyle = `rgba(220,232,255,${p.o})`
+        ctx.fillRect(p.x, p.y, 0.7, 2.2)
+      })
+      raf = requestAnimationFrame(draw)
+    }
+
+    const start = () => {
+      if (running) return
+      running = true
+      raf = requestAnimationFrame(draw)
+    }
+
+    const stop = () => {
+      running = false
+      cancelAnimationFrame(raf)
+    }
+
+    // Only animate while the section is on screen — this loop was running
+    // for the lifetime of the page, even at the hero or footer.
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        start()
+      } else {
+        stop()
+      }
+    })
+    visibilityObserver.observe(canvas)
+
+    const resizeObserver = new ResizeObserver(() => {
+      setSize()
+      init()
+    })
+    resizeObserver.observe(canvas.parentElement || document.body)
+
+    init()
+
+    return () => {
+      visibilityObserver.disconnect()
+      resizeObserver.disconnect()
+      stop()
+    }
+  }, [])
 
   return (
-    <section className="pricing-area tmp-section-gapTop" id="pricing">
-      <div className="container">
-        <div className="section-head mb--50">
-          <div className="section-sub-title center-title tmp-scroll-trigger tmp-fade-in animation-order-1">
-            <span className="subtitle">Freelance Rates</span>
-          </div>
-          <h2 className="title split-collab tmp-scroll-trigger tmp-fade-in animation-order-2">
-            Pricing &amp; Packages
-          </h2>
-          <p className="description section-sm tmp-scroll-trigger tmp-fade-in animation-order-3">
-            Transparent pricing tiers based on project complexity. All projects include responsive design, clean code, and post-launch support.
+    <section
+      ref={sectionRef}
+      className={`cosmic-section cosmic-pricing ${ready ? 'is-ready' : ''}`}
+      id="pricing"
+    >
+      <div className="vignette" />
+
+      <div aria-hidden="true" className="accent-lines">
+        <div className="hline" />
+        <div className="hline" />
+        <div className="hline" />
+        <div className="vline" />
+        <div className="vline" />
+        <div className="vline" />
+      </div>
+
+      <canvas ref={canvasRef} className="pricing-canvas" />
+
+      <div className="cosmic-section-inner relative">
+        <div className="cosmic-head--center mx-auto mb-14 max-w-3xl">
+          <span className="cosmic-eyebrow">Pricing</span>
+          <h2 className="cosmic-title">Pricing &amp; Packages</h2>
+          <div className="cosmic-line" />
+          <p className="cosmic-desc">
+            Transparent tiers based on project complexity. Every project includes responsive
+            design, clean code, and post-launch support.
           </p>
         </div>
 
-        <div className="row g-5">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
           {tiers.map((tier, index) => (
             <div
-              key={tier.category}
-              className={`col-lg-3 col-md-6 col-sm-6 col-12 tmp-scroll-trigger tmp-fade-in animation-order-${index + 1}`}
+              key={tier.name}
+              className={`pricing-card ${tier.highlighted ? 'pricing-card--pop' : ''}`}
+              style={{ animationDelay: `${0.32 + index * 0.08}s` }}
             >
-              <div style={tier.highlighted ? highlightedCardStyle : cardStyle}>
-                {/* Header */}
-                <h3 style={{
-                  fontSize: '22px',
-                  fontWeight: 600,
-                  color: 'var(--color-heading)',
-                  marginBottom: '8px',
-                  fontFamily: 'var(--font-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  flexWrap: 'wrap'
-                }}>
-                  {tier.category}
-                  {tier.highlighted && (
-                    <span style={{
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      color: '#fff',
-                      background: 'var(--color-primary)',
-                      padding: '3px 10px',
-                      borderRadius: '4px',
-                      letterSpacing: '0.5px',
-                      textTransform: 'uppercase'
-                    }}>
-                      Popular
-                    </span>
-                  )}
-                </h3>
-                <p style={{
-                  fontSize: '15px',
-                  color: 'var(--color-body)',
-                  marginBottom: '24px'
-                }}>
-                  {tier.complexity} Complexity
-                </p>
-
-                {/* Price */}
-                <h4 style={{
-                  fontSize: '28px',
-                  fontWeight: 700,
-                  color: 'var(--color-primary)',
-                  marginBottom: '24px',
-                  fontFamily: 'var(--font-primary)',
-                  lineHeight: 1.3
-                }}>
-                  {tier.price}
-                </h4>
-
-                {/* Examples */}
-                <div style={{ marginBottom: '20px' }}>
-                  <h5 style={{
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    color: 'var(--color-heading)',
-                    marginBottom: '6px'
-                  }}>
-                    Examples
-                  </h5>
-                  <p style={{
-                    fontSize: '14px',
-                    color: 'var(--color-body)',
-                    margin: 0,
-                    lineHeight: 1.7
-                  }}>
-                    {tier.examples.join(', ')}
-                  </p>
+              {tier.highlighted && (
+                <div className="pricing-chip">
+                  <span className="dot" />
+                  Most Popular
                 </div>
+              )}
 
-                {/* Features */}
-                <div style={{ flex: 1 }}>
-                  <h5 style={{
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    color: 'var(--color-heading)',
-                    marginBottom: '12px'
-                  }}>
-                    Includes
-                  </h5>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {tier.features.map((feature) => (
-                      <li key={feature} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        fontSize: '15px',
-                        color: 'var(--color-body)',
-                        marginBottom: '12px',
-                        fontWeight: 500
-                      }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="var(--color-primary)">
-                          <path d="M9.707 19.121a.997.997 0 0 1-1.414 0l-5.646-5.647a1.5 1.5 0 0 1 0-2.121l.707-.707a1.5 1.5 0 0 1 2.121 0L9 14.171l9.525-9.525a1.5 1.5 0 0 1 2.121 0l.707.707a1.5 1.5 0 0 1 0 2.121z" />
-                        </svg>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              <h3 className="plan-name">{tier.name}</h3>
+              <div className="plan-price">{tier.price}</div>
+              <p className="plan-tagline">{tier.tagline}</p>
+              <p className="plan-desc">{tier.description}</p>
 
-                {/* Note */}
-                {tier.note && (
-                  <p style={{
-                    fontSize: '13px',
-                    color: 'var(--color-body)',
-                    fontStyle: 'italic',
-                    marginTop: '12px',
-                    opacity: 0.75,
-                    lineHeight: 1.6
-                  }}>
-                    *{tier.note}
-                  </p>
-                )}
+              <ul className="plan-features">
+                {tier.features.map((feature) => (
+                  <li key={feature}>
+                    <Check size={15} strokeWidth={1.5} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
 
-                {/* CTA Button */}
-                <a
-                  href="#contacts"
-                  className="smoth-animation"
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    marginTop: '24px',
-                    padding: '12px 20px',
-                    fontSize: '15px',
-                    fontWeight: 500,
-                    color: '#fff',
-                    background: tier.highlighted ? 'var(--color-primary)' : 'transparent',
-                    border: tier.highlighted ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
-                    borderRadius: '6px',
-                    textAlign: 'center',
-                    textDecoration: 'none',
-                    transition: 'all 0.3s ease',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'var(--color-primary)'
-                    e.currentTarget.style.borderColor = 'var(--color-primary)'
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!tier.highlighted) {
-                      e.currentTarget.style.background = 'transparent'
-                      e.currentTarget.style.borderColor = 'var(--color-border)'
-                    }
-                  }}
-                >
-                  Get a Quote
-                </a>
-              </div>
+              {tier.note && <p className="plan-note">*{tier.note}</p>}
+
+              <HudButton
+                href="#contacts"
+                variant={tier.highlighted ? 'primary' : 'secondary'}
+              >
+                Get a Quote
+              </HudButton>
             </div>
           ))}
         </div>

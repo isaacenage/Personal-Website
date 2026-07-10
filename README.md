@@ -1,162 +1,43 @@
-# Isaac Enage's Portfolio Website
+# byZenterra.org
 
-A modern, interactive portfolio website showcasing professional work, tools, and services in GIS and web development.
+The official website of byZenterra — a geospatial, analytics, and web studio. byZenterra builds interactive web maps, decision-ready dashboards, and modern web applications for organizations that run on location data.
 
-## Overview
+## Site Structure
 
-This website serves as a professional portfolio and platform for sharing GIS tools and web development projects. It features a clean, modern design with interactive elements and real-time feedback capabilities.
+| Route | Purpose |
+|-------|---------|
+| `/` | Home — horizon hero, studio overview, featured work, latest insights, contact |
+| `/what-we-do/` | Services, engagement process, and pricing |
+| `/who-we-are/` | Mission and values, track record, leadership |
+| `/insights/` | Articles written by the studio (field notes, walkthroughs, opinions) |
+| `/insights/<slug>/` | Individual article pages |
+| `/Portfolio/*`, `/Tools/*` | Static project showcases and tools (e.g. Title Plotter PH) |
 
-## Key Features
+## Publishing an Insights Article
 
-### 1. Portfolio Showcase
-- Professional portfolio display
-- Project galleries
-- Service descriptions
-- Resume/CV section
-- Client reviews
-
-### 2. Interactive Tools
-- Title Plotter PH - QGIS Plugin
-  - Technical description plotting
-  - Bearing and distance calculations
-  - Interactive map visualization
-  - Real-time geometry preview
-
-### 3. Modern UI/UX
-- Responsive design
-- Dark theme with red accents
-- Smooth animations
-- Interactive elements
-- Custom cursor effects
-
-### 4. Social Features
-- Real-time comment system
-- Reddit-style threaded discussions
-- User avatars (Dicebear integration)
-- Voting system
-- Password-protected moderation
+Articles live in [`lib/insights.js`](lib/insights.js). Add an object to the `ARTICLES` array (slug, title, category, date, author, excerpt, and a `body` of content blocks) and rebuild — the article page and index/teaser cards are generated automatically.
 
 ## Technical Stack
 
-### Frontend
-- HTML5
-- CSS3
-- JavaScript
-- FontAwesome 6.5.0
-- Custom animations
-- Responsive design
-
-### Backend
-- Firebase
-  - Authentication
-  - Realtime Database
-  - Analytics
-- Dicebear API for avatars
-
-### Development Tools
-- Modern IDE support
-- Version control
-- Responsive testing
-- Cross-browser compatibility
-
-## Features in Detail
-
-### Title Plotter PH
-- QGIS plugin for Philippine land titles
-- Technical description plotting
-- Bearing and distance calculations
-- Interactive map visualization
-- Real-time geometry preview
-- Comprehensive documentation
-- Step-by-step tutorials
-
-### Comment System
-- Real-time updates
-- Threaded discussions
-- User avatars
-- Voting mechanism
-- Reply functionality
-- Moderation tools
-- Password protection
-
-### Portfolio Sections
-- Home
-- About
-- Services
-- Portfolio
-- Resume
-- Reviews
-- Contact
-
-## Security Features
-- Firebase authentication
-- Password-protected moderation
-- Secure data handling
-- Protected routes
-- Input validation
-
-## Responsive Design
-- Mobile-first approach
-- Tablet optimization
-- Desktop enhancement
-- Touch-friendly interfaces
-- Adaptive layouts
-
-## Design Elements
-- Dark theme
-- Red accent colors
-- Modern typography
-- Custom animations
-- Interactive elements
-- Professional imagery
-
-## Real-time Features
-- Live comment updates
-- Instant feedback
-- Dynamic content loading
-- Interactive elements
-- Real-time notifications
-
-## Analytics
-- Firebase Analytics integration
-- User behavior tracking
-- Performance monitoring
-- Usage statistics
-- Error tracking
+- **Framework**: Next.js 14 (App Router, static export via `output: 'export'`)
+- **Styling**: Tailwind CSS + the custom cosmic theme (`app/styles/cosmic-theme.css`)
+- **3D / animation**: Three.js horizon hero, Lenis smooth scrolling, IntersectionObserver reveals
+- **Contact**: EmailJS-backed contact form and chat widget
+- **Hosting**: Static export served at [byzenterra.org](https://www.byzenterra.org) (see `CNAME`)
 
 ## Development
 
-### Prerequisites
-- Modern web browser
-- Node.js (for development)
-- Firebase account
-- Git
-
-### Installation
-1. Clone the repository
-2. Install dependencies
-3. Configure Firebase
-4. Run development server
-
-### Configuration
-- Firebase setup
-- API keys
-- Environment variables
-- Custom settings
+```bash
+npm install
+npm run dev     # local development
+npm run build   # static export to out/
+```
 
 ## License
-MIT License - See LICENSE file for details
 
-## Contributing
-Contributions are welcome! Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
+MIT License — see LICENSE file for details.
 
 ## Contact
-- Email: isaacenagework@gmail.com
-- Website: https://www.isaacenage.xyz
-- GitHub: [isaacenage](https://github.com/isaacenage)
 
-## 🙏 Acknowledgments
-- FontAwesome for icons
-- Dicebear for avatars
-- Firebase for backend services
-- All contributors and supporters 
+- Website: https://www.byzenterra.org
+- Use the contact form on the site to start a project.

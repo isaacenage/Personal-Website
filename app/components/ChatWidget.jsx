@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useEmailJS } from '../hooks/useEmailJS'
+import { HudButton } from '@/components/ui/hud-button'
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -46,11 +47,11 @@ const ChatWidget = () => {
       </label>
       <div className="wrapper">
         <div className="head-text">
-          Let&apos;s chat with me? - Online
+          Chat with byZenterra — Online
         </div>
         <div className="chat-box">
           <div className="desc-text">
-            Please fill out the form below to start chatting with me directly.
+            Fill out the form below and the team will get back to you directly.
           </div>
           <form className="tmp-dynamic-form" onSubmit={handleSubmit}>
             <div className="contact-form-wrapper row">
@@ -93,24 +94,10 @@ const ChatWidget = () => {
                 </div>
               </div>
               <div className="col-lg-12">
-                <div className="tmp-button-here">
-                  <button
-                    className="tmp-btn hover-icon-reverse radius-round w-100"
-                    type="submit"
-                    disabled={isLoading}
-                  >
-                    <span className="icon-reverse-wrapper">
-                      <span className="btn-text">
-                        {isLoading ? 'Sending...' : 'Send Message'}
-                      </span>
-                      <span className="btn-icon">
-                        <i className="fa-sharp fa-regular fa-arrow-right"></i>
-                      </span>
-                      <span className="btn-icon">
-                        <i className="fa-sharp fa-regular fa-arrow-right"></i>
-                      </span>
-                    </span>
-                  </button>
+                <div className="tmp-button-here text-center">
+                  <HudButton type="submit" disabled={isLoading}>
+                    {isLoading ? 'Sending...' : 'Send Message'}
+                  </HudButton>
                 </div>
               </div>
             </div>

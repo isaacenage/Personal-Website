@@ -2,129 +2,82 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { HudButton } from '@/components/ui/hud-button'
+
+const NAV_ITEMS = [
+  { href: '/', label: 'Home' },
+  { href: '/what-we-do', label: 'What We Do' },
+  { href: '/who-we-are', label: 'Who We Are' },
+  { href: '/insights', label: 'Insights' },
+]
+
+// trailingSlash is on in next.config.js, so normalize before comparing.
+const isActive = (pathname, href) => {
+  const current = pathname.replace(/\/+$/, '') || '/'
+  if (href === '/') return current === '/'
+  return current === href || current.startsWith(`${href}/`)
+}
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
-  }
+  const closeMobileMenu = () => setIsMobileMenuOpen(false)
 
   return (
     <>
-      <header className="tmp-header-area-start header-one header--sticky header--transparent">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="header-content">
-                <div className="logo">
-                  <Link href="/">
-                    <img className="logo-dark" src="/assets/images/logo/zachwebfull.png" alt="ZachWeb - Personal Portfolio" />
-                  </Link>
-                </div>
-                <div className="tmp-mainmenu-nav d-none d-xl-block">
-                  <nav className="navbar-example2 onepagenav onepage">
-                    <ul className="tmp-mainmenu nav nav-pills">
-                      <li className="current"><Link className="smoth-animation" href="/">Home</Link></li>
-                      <li className="nav-item"><a className="smoth-animation" href="#about">About</a></li>
-                      <li className="nav-item"><a className="smoth-animation" href="#service">Services</a></li>
-                      <li className="nav-item"><a className="smoth-animation" href="#pricing">Pricing</a></li>
-                      <li className="nav-item"><a className="smoth-animation" href="#portfolio">Portfolio</a></li>
-                      <li className="nav-item"><a className="smoth-animation" href="#resume">Resume</a></li>
-                      <li className="nav-item"><a className="smoth-animation" href="#contacts">Contact</a></li>
-                    </ul>
-                  </nav>
-                </div>
+      <header className="cosmic-header">
+        <Link href="/" className="cosmic-logo">
+          <img src="/assets/images/logo/byzenterra-full.svg" alt="byZenterra" />
+        </Link>
 
-                <div className="tmp-header-right">
-                  <div className="social-share-wrapper d-none d-md-block">
-                    <div className="social-link">
-                      <a href="https://instagram.com/isaacenagework" target="_blank" rel="noopener noreferrer">
-                        <i className="fa-brands fa-instagram"></i>
-                      </a>
-                      <a href="https://ph.linkedin.com/in/ivenage" target="_blank" rel="noopener noreferrer">
-                        <i className="fa-brands fa-linkedin-in"></i>
-                      </a>
-                      <a href="https://www.x.com/isaacwork0105" target="_blank" rel="noopener noreferrer">
-                        <i className="fa-brands fa-twitter"></i>
-                      </a>
-                      <a href="https://www.facebook.com/isaacenagework" target="_blank" rel="noopener noreferrer">
-                        <i className="fa-brands fa-facebook-f"></i>
-                      </a>
-                      <a href="https://www.github.com/isaacenage" target="_blank" rel="noopener noreferrer">
-                        <i className="fa-brands fa-github"></i>
-                      </a>
-                    </div>
-                  </div>
+        <nav className="cosmic-nav" aria-label="Main navigation">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={isActive(pathname, item.href) ? 'active' : ''}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
-                  <div className="tmp-side-collups-area d-block d-xl-none">
-                    <button
-                      className="hamberger-menu humberger_menu_active"
-                      onClick={toggleMobileMenu}
-                    >
-                      <i id="menuBtn" className="fa-light fa-bars humberger-menu"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <HudButton href="/#contacts" variant="secondary" className="cosmic-header-cta">
+          Start a Project
+        </HudButton>
+
+        <button
+          className="cosmic-mobile-toggle"
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Open menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </header>
 
-      {/* Mobile Menu */}
-      <div className="d-block d-xl-none">
-        <div className={`tmp-popup-mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-          <div className="inner">
-            <div className="header-top">
-              <div className="logo">
-                <Link href="/" className="logo-area">
-                  <img className="logo-dark" src="/assets/images/logo/zachwebfull.png" alt="logo" />
-                  <img className="logo-white" src="/assets/images/logo/logo-white.png" alt="logo" />
-                </Link>
-              </div>
-              <div className="close-menu">
-                <button
-                  className="close-button tmp-round-action-btn"
-                  onClick={toggleMobileMenu}
-                >
-                  <i className="fa-sharp fa-light fa-xmark"></i>
-                </button>
-              </div>
-            </div>
+      <div className={`cosmic-mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
+        <button className="cosmic-mobile-close" onClick={closeMobileMenu} aria-label="Close menu">
+          <i className="fa-sharp fa-light fa-xmark"></i>
+        </button>
 
-            <ul className="tmp-mainmenu onepagenav-click onepage">
-              <li className="current"><Link className="smoth-animation" href="/" onClick={toggleMobileMenu}>Home</Link></li>
-              <li className="nav-item"><a className="smoth-animation" href="#about" onClick={toggleMobileMenu}>About</a></li>
-              <li className="nav-item"><a className="smoth-animation" href="#service" onClick={toggleMobileMenu}>Services</a></li>
-              <li className="nav-item"><a className="smoth-animation" href="#pricing" onClick={toggleMobileMenu}>Pricing</a></li>
-              <li className="nav-item"><a className="smoth-animation" href="#portfolio" onClick={toggleMobileMenu}>Portfolio</a></li>
-              <li className="nav-item"><a className="smoth-animation" href="#resume" onClick={toggleMobileMenu}>Resume</a></li>
-              <li className="nav-item"><a className="smoth-animation" href="#contacts" onClick={toggleMobileMenu}>Contact</a></li>
-            </ul>
+        {NAV_ITEMS.map((item) => (
+          <Link key={item.href} href={item.href} onClick={closeMobileMenu}>
+            {item.label}
+          </Link>
+        ))}
 
-            <div className="social-wrapper mt--40">
-              <span className="subtitle">find with me</span>
-              <div className="social-link">
-                <a href="https://instagram.com/isaacenagework" target="_blank" rel="noopener noreferrer">
-                  <i className="fa-brands fa-instagram"></i>
-                </a>
-                <a href="https://ph.linkedin.com/in/ivenage" target="_blank" rel="noopener noreferrer">
-                  <i className="fa-brands fa-linkedin-in"></i>
-                </a>
-                <a href="https://www.x.com/isaacwork0105" target="_blank" rel="noopener noreferrer">
-                  <i className="fa-brands fa-twitter"></i>
-                </a>
-                <a href="https://www.facebook.com/isaacenagework" target="_blank" rel="noopener noreferrer">
-                  <i className="fa-brands fa-facebook-f"></i>
-                </a>
-                <a href="https://www.github.com/isaacenage" target="_blank" rel="noopener noreferrer">
-                  <i className="fa-brands fa-github"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
+        <HudButton
+          href="/#contacts"
+          variant="secondary"
+          className="cosmic-header-cta"
+          onClick={closeMobileMenu}
+        >
+          Start a Project
+        </HudButton>
       </div>
     </>
   )

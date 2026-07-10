@@ -1,79 +1,73 @@
-const Services = () => {
-  const services = [
-    {
-      id: '01',
-      title: 'Interactive Web Mapping',
-      description: 'I develop rich, browser-based maps using platforms like ArcGIS Online, LeafletJS, and Mapbox GL JS. These interactive tools allow users to explore spatial data with fluid navigation, custom layers, and real-time updates.'
-    },
-    {
-      id: '02',
-      title: 'Geospatial Analysis & Location Intelligence',
-      description: 'Using advanced GIS workflows, I extract insights from spatial data to support planning, decision-making, and asset management. From parcel mapping to spatial statistics, my work bridges data and geography.'
-    },
-    {
-      id: '03',
-      title: 'Data Visualization & Reporting',
-      description: 'I create clean, insightful dashboards using Power BI and Tableau to transform raw data into meaningful visuals. These reports help stakeholders track KPIs, uncover trends, and interact with data dynamically.'
-    },
-    {
-      id: '04',
-      title: 'Web Design & Front-End Development',
-      description: 'I build responsive, fast-loading websites using HTML, Tailwind CSS, and JavaScript tailored to your needs. Whether it\'s for portfolios, internal systems, or project showcases, I prioritize performance and user experience.'
-    },
-    {
-      id: '05',
-      title: 'Creative Design & Visual Assets',
-      description: 'From digital illustrations to print-ready materials, I use Adobe Illustrator and Photoshop to craft high-impact visuals. I design infographics and custom assets for both web and social platforms.'
-    },
-    {
-      id: '06',
-      title: 'Workflow Automation & Data Management',
-      description: 'I streamline repetitive tasks and organize complex data using spreadsheets, SharePoint, and automation tools like Power Automate. I also build custom forms and lightweight apps through Power Apps to enhance team collaboration and data collection.'
-    }
-  ]
+'use client'
 
+import { Map, Compass, BarChart3, Code, PenTool, Workflow } from 'lucide-react'
+import { FeatureCard } from '@/components/ui/grid-feature-cards'
+import { AnimatedContainer } from '@/components/ui/animated-container'
+
+const services = [
+  {
+    title: 'Interactive Web Mapping',
+    icon: Map,
+    description:
+      'Rich, browser-based maps built with ArcGIS Online, LeafletJS, and Mapbox GL JS — fluid navigation, custom layers, and real-time updates.',
+  },
+  {
+    title: 'Geospatial Analysis',
+    icon: Compass,
+    description:
+      'Advanced GIS workflows that extract insight from spatial data — parcel mapping, spatial statistics, and location intelligence for planning and asset management.',
+  },
+  {
+    title: 'Data Visualization & Reporting',
+    icon: BarChart3,
+    description:
+      'Clean, insightful dashboards in Power BI and Tableau that turn raw data into visuals your stakeholders can track, explore, and act on.',
+  },
+  {
+    title: 'Web Design & Development',
+    icon: Code,
+    description:
+      'Responsive, fast-loading websites built with HTML, Tailwind CSS, and JavaScript — company sites, internal systems, and project showcases.',
+  },
+  {
+    title: 'Creative Design & Visual Assets',
+    icon: PenTool,
+    description:
+      'High-impact visuals crafted in Illustrator and Photoshop — infographics, digital illustrations, and print-ready assets for web and social.',
+  },
+  {
+    title: 'Workflow Automation',
+    icon: Workflow,
+    description:
+      'Repetitive tasks streamlined with SharePoint, Power Automate, and custom Power Apps — better collaboration, cleaner data collection.',
+  },
+]
+
+const Services = () => {
   return (
-    <section className="latest-service-area tmp-section-gapTop" id="service">
-      <div className="container">
-        <div className="section-head mb--50">
-          <div className="section-sub-title center-title tmp-scroll-trigger tmp-fade-in animation-order-1">
-            <span className="subtitle">Services I Offer</span>
-          </div>
-          <h2 className="title split-collab tmp-scroll-trigger tmp-fade-in animation-order-2">
-            Smart Solutions for <br /> a Digital World
+    <section className="cosmic-section" id="service">
+      <div className="cosmic-section-inner space-y-14">
+        <AnimatedContainer className="cosmic-head--center mx-auto max-w-3xl">
+          <span className="cosmic-eyebrow">Services</span>
+          <h2 className="cosmic-title">
+            Smart Solutions for
+            <br />a Digital World
           </h2>
-          <p className="description section-sm tmp-scroll-trigger tmp-fade-in animation-order-3">
-            Delivering geospatial insights, intelligent data systems, and custom web tools that drive informed decisions.
+          <div className="cosmic-line" />
+          <p className="cosmic-desc">
+            Geospatial insight, intelligent data systems, and custom web tools that drive informed
+            decisions.
           </p>
-        </div>
-        <div className="row">
-          <div className="col-lg-6 col-sm-6">
-            {services.slice(0, 3).map((service, index) => (
-              <div
-                key={service.id}
-                className={`service-card-v2 tmponhover tmp-scroll-trigger tmp-fade-in animation-order-${index + 1}`}
-              >
-                <h2 className="service-card-num">
-                  <span>{service.id}.</span>{service.title}
-                </h2>
-                <p className="service-para">{service.description}</p>
-              </div>
-            ))}
-          </div>
-          <div className="col-lg-6 col-sm-6">
-            {services.slice(3, 6).map((service, index) => (
-              <div
-                key={service.id}
-                className={`service-card-v2 tmponhover tmp-scroll-trigger tmp-fade-in animation-order-${index + 4}`}
-              >
-                <h2 className="service-card-num">
-                  <span>{service.id}.</span>{service.title}
-                </h2>
-                <p className="service-para">{service.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        </AnimatedContainer>
+
+        <AnimatedContainer
+          delay={0.4}
+          className="grid grid-cols-1 divide-x divide-y divide-dashed divide-white/10 cosmic-grid-frame sm:grid-cols-2 md:grid-cols-3"
+        >
+          {services.map((service) => (
+            <FeatureCard key={service.title} feature={service} />
+          ))}
+        </AnimatedContainer>
       </div>
     </section>
   )

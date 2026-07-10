@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useEmailJS } from '../hooks/useEmailJS'
+import { AnimatedContainer } from '@/components/ui/animated-container'
+import { HudButton } from '@/components/ui/hud-button'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -9,14 +11,14 @@ const Contact = () => {
     phone: '',
     email: '',
     subject: '',
-    message: ''
+    message: '',
   })
   const { sendEmail, isLoading, message } = useEmailJS()
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     })
   }
 
@@ -30,124 +32,90 @@ const Contact = () => {
         phone: '',
         email: '',
         subject: '',
-        message: ''
+        message: '',
       })
     }
   }
 
   return (
-    <section className="contact-area tmp-section-gapTop" id="contacts">
-      <div className="container">
-        <div className="section-head mb--50">
-          <div className="section-sub-title center-title tmp-scroll-trigger tmp-fade-in animation-order-1">
-            <span className="subtitle">Contact Me</span>
-          </div>
-          <h2 className="title split-collab tmp-scroll-trigger tmp-fade-in animation-order-2">
-            Let&apos;s Work Together
+    <section className="cosmic-section" id="contacts">
+      <div className="cosmic-section-inner max-w-3xl">
+        <AnimatedContainer className="cosmic-head--center mx-auto mb-14 max-w-3xl">
+          <span className="cosmic-eyebrow">Start a Project</span>
+          <h2 className="cosmic-title">
+            Let&apos;s Build
+            <br />
+            Something Together
           </h2>
-          <p className="description section-sm tmp-scroll-trigger tmp-fade-in animation-order-3">
-            Ready to bring your geospatial and development projects to life? Get in touch and let&apos;s discuss your needs.
+          <div className="cosmic-line" />
+          <p className="cosmic-desc">
+            Tell us what you&apos;re mapping, measuring, or building — the byZenterra team will get
+            back to you with a plan and a quote.
           </p>
-        </div>
+        </AnimatedContainer>
 
-        <div className="row">
-          <div className="col-lg-8 offset-lg-2">
-            <form className="tmp-dynamic-form" id="contact-form" onSubmit={handleSubmit}>
-              <div className="contact-form-wrapper row">
-                <div className="col-lg-6">
-                  <div className="form-group">
-                    <input
-                      className="input-field"
-                      name="name"
-                      placeholder="Your Name"
-                      type="text"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-6">
-                  <div className="form-group">
-                    <input
-                      className="input-field"
-                      name="phone"
-                      placeholder="Phone Number"
-                      type="text"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-6">
-                  <div className="form-group">
-                    <input
-                      className="input-field"
-                      name="email"
-                      placeholder="Your Email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-6">
-                  <div className="form-group">
-                    <input
-                      className="input-field"
-                      name="subject"
-                      placeholder="Subject"
-                      type="text"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group">
-                    <textarea
-                      className="input-field"
-                      placeholder="Your Message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      required
-                    ></textarea>
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="tmp-button-here">
-                    <button
-                      className="tmp-btn hover-icon-reverse radius-round w-100"
-                      type="submit"
-                      disabled={isLoading}
-                    >
-                      <span className="icon-reverse-wrapper">
-                        <span className="btn-text">
-                          {isLoading ? 'Sending...' : 'Send Message'}
-                        </span>
-                        <span className="btn-icon">
-                          <i className="fa-sharp fa-regular fa-arrow-right"></i>
-                        </span>
-                        <span className="btn-icon">
-                          <i className="fa-sharp fa-regular fa-arrow-right"></i>
-                        </span>
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </form>
-            {message && (
-              <div id="form-messages" className="error">
-                <div className={`alert ${message.includes('Error') ? 'alert-danger' : 'alert-success'}`}>
-                  {message}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <AnimatedContainer delay={0.3}>
+          <form className="cosmic-form" id="contact-form" onSubmit={handleSubmit}>
+            <input
+              className="cosmic-input"
+              name="name"
+              placeholder="Your Name"
+              type="text"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+            />
+            <input
+              className="cosmic-input"
+              name="phone"
+              placeholder="Phone Number"
+              type="text"
+              value={formData.phone}
+              onChange={handleInputChange}
+            />
+            <input
+              className="cosmic-input"
+              name="email"
+              placeholder="Your Email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+            />
+            <input
+              className="cosmic-input"
+              name="subject"
+              placeholder="Subject"
+              type="text"
+              value={formData.subject}
+              onChange={handleInputChange}
+            />
+            <textarea
+              className="cosmic-input full"
+              placeholder="Your Message"
+              name="message"
+              value={formData.message}
+              onChange={handleInputChange}
+              required
+            ></textarea>
+            <div className="full flex justify-center">
+              <HudButton type="submit" disabled={isLoading}>
+                {isLoading ? 'Sending…' : 'Send Message'}
+              </HudButton>
+            </div>
+          </form>
+
+          {message && (
+            <div
+              className={`cosmic-alert ${
+                message.includes('Error') ? 'cosmic-alert--error' : 'cosmic-alert--success'
+              }`}
+              role="status"
+            >
+              {message}
+            </div>
+          )}
+        </AnimatedContainer>
       </div>
     </section>
   )

@@ -1,13 +1,16 @@
 import './globals.css'
+import './styles/horizon-hero.css'
+import './styles/cosmic-theme.css'
+import './styles/hud-button.css'
 import ScrollToTop from './components/ScrollToTop'
 import ChatWidget from './components/ChatWidget'
-import ScriptLoader from './components/ScriptLoader'
+import SmoothScroll from './components/SmoothScroll'
 
 export const metadata = {
-  title: 'Zaxus',
-  description: 'Welcome to Zaxus — Zac\'s Nexus, the digital space of Isaac Enage. Explore a curated portfolio highlighting his journey and expertise in geospatial solutions, data analytics, and web development.',
+  title: 'byZenterra — Geospatial, Analytics & Web Studio',
+  description: 'byZenterra is a creative technology studio building interactive web maps, decision-ready dashboards, and modern web applications. We turn spatial data, analytics, and code into products your team can act on.',
   icons: {
-    icon: '/assets/images/zwlogo.png',
+    icon: '/assets/images/logo/byzenterra-icon.svg',
   },
 }
 
@@ -18,7 +21,7 @@ export default function RootLayout({ children }) {
         {children}
         <ScrollToTop />
         <ChatWidget />
-        <ScriptLoader />
+        <SmoothScroll />
       </body>
     </html>
   )

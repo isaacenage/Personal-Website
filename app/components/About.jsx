@@ -1,88 +1,75 @@
-import Link from 'next/link'
+'use client'
+
+import { Map, Code, BarChart3 } from 'lucide-react'
+import { FeatureCard } from '@/components/ui/grid-feature-cards'
+import { AnimatedContainer } from '@/components/ui/animated-container'
+import { HudButton } from '@/components/ui/hud-button'
+
+const capabilities = [
+  {
+    title: 'Geospatial Support',
+    icon: Map,
+    description:
+      'Extensive corporate project experience — from land acquisition mapping to enterprise GIS operations.',
+  },
+  {
+    title: 'Dev Solutions',
+    icon: Code,
+    description:
+      'From custom web maps to process automation, we build responsive applications that make spatial data accessible across devices.',
+  },
+  {
+    title: 'Data Analytics',
+    icon: BarChart3,
+    description:
+      'Streamlined organizational data processes integrating Excel, SharePoint, Power Apps & Automate, BI, and other analysis tools.',
+  },
+]
 
 const About = () => {
   return (
-    <section className="about-us-area tmp-section-gapTop" id="about">
-      <div className="container">
-        <div className="row align-items-center">
-          <div className="col-lg-6">
-            <div className="about-us-left-content-wrap bg-vactor-one">
-              <div className="years-of-experience-card tmp-scroll-trigger tmp-fade-in animation-order-1">
-                <h2 className="counter card-title">
-                  <span className="odometer" data-count="6">6</span>+
-                </h2>
-                <p className="card-para">years of experience</p>
-              </div>
-              <div className="design-card tmp-scroll-trigger tmp-fade-in animation-order-2">
-                <div className="design-card-img">
-                  <div className="icon">
-                    <i className="fa-sharp fa-thin fa-map"></i>
-                  </div>
-                </div>
-                <div className="card-info">
-                  <h3 className="card-title">Geospatial Support</h3>
-                  <p className="card-para">Extensive corporate project experience</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-6">
-            <div className="about-us-right-content-wrap">
-              <div className="section-head text-align-left mb--50">
-                <div className="section-sub-title tmp-scroll-trigger tmp-fade-in animation-order-1">
-                  <span className="subtitle">About Me</span>
-                </div>
-                <h2 className="title split-collab tmp-scroll-trigger tmp-fade-in animation-order-2">
-                  Innovating at the Intersection <br /> of Maps, Metrics, and Code
-                </h2>
-                <p className="description tmp-scroll-trigger tmp-fade-in animation-order-3">
-                  As a GIS Specialist in a corporate setting, I&apos;m driven by the potential of geospatial technology to optimize workflows and create automated solutions that make a meaningful impact. By combining my passion for custom tool development with expertise in GIS, data analytics, and web development, I streamline processes, enhance efficiency, and contribute to the evolving future of spatial data management and analysis.
-                </p>
-              </div>
-              <div className="about-us-section-card row g-5">
-                <div className="col-lg-6 col-md-6 col-sm-6 col-12">
-                  <div className="about-us-card tmponhover tmp-scroll-trigger tmp-fade-in animation-order-4">
-                    <div className="card-head">
-                      <div className="logo-img">
-                        <img src="/assets/images/about/logo-1.svg" alt="logo" />
-                      </div>
-                      <h3 className="card-title">Dev Solutions</h3>
-                    </div>
-                    <p className="card-para">
-                      From custom web maps to process automation, I build responsive applications that make spatial data accessible across devices.
-                    </p>
-                  </div>
-                </div>
+    <section className="cosmic-section" id="about">
+      <div className="cosmic-section-inner">
+        <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
+          <AnimatedContainer>
+            <span className="cosmic-eyebrow">The Studio</span>
+            <h2 className="cosmic-title">
+              Maps, Metrics,
+              <br />
+              and Code
+            </h2>
+            <div className="cosmic-line" />
+            <p className="cosmic-desc">
+              byZenterra is a studio built on the belief that geospatial technology can transform
+              how organizations work. We combine custom tool development with deep expertise in
+              GIS, data analytics, and web development to streamline processes, enhance
+              efficiency, and move spatial data management forward for the teams we serve.
+            </p>
 
-                <div className="col-lg-6 col-md-6 col-sm-6 col-12">
-                  <div className="about-us-card tmponhover tmp-scroll-trigger tmp-fade-in animation-order-5">
-                    <div className="card-head">
-                      <div className="logo-img">
-                        <img src="/assets/images/about/logo-3.svg" alt="logo" />
-                      </div>
-                      <h3 className="card-title">Data Analytics</h3>
-                    </div>
-                    <p className="card-para">
-                      Streamline organizational data processes by integrating Excel, SharePoint, Power Apps &amp; Automate, BI, and other analysis tools.
-                    </p>
-                  </div>
-                </div>
+            <div className="mt-12 flex flex-wrap items-end gap-10">
+              <div>
+                <div className="cosmic-stat-number">6+</div>
+                <div className="cosmic-stat-label">Years in the Field</div>
               </div>
-              <div className="about-btn mt--40 tmp-scroll-trigger tmp-fade-in animation-order-6">
-                <Link className="tmp-btn hover-icon-reverse radius-round" href="/about">
-                  <span className="icon-reverse-wrapper">
-                    <span className="btn-text">Read More About Me</span>
-                    <span className="btn-icon">
-                      <i className="fa-sharp fa-regular fa-arrow-right"></i>
-                    </span>
-                    <span className="btn-icon">
-                      <i className="fa-sharp fa-regular fa-arrow-right"></i>
-                    </span>
-                  </span>
-                </Link>
+              <div className="flex flex-wrap gap-4">
+                <HudButton variant="secondary" href="/what-we-do">
+                  What We Do
+                </HudButton>
+                <HudButton variant="secondary" href="/who-we-are">
+                  Who We Are
+                </HudButton>
               </div>
             </div>
-          </div>
+          </AnimatedContainer>
+
+          <AnimatedContainer
+            delay={0.3}
+            className="grid grid-cols-1 divide-y divide-dashed divide-white/10 cosmic-grid-frame"
+          >
+            {capabilities.map((capability) => (
+              <FeatureCard key={capability.title} feature={capability} />
+            ))}
+          </AnimatedContainer>
         </div>
       </div>
     </section>

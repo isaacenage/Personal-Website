@@ -1,53 +1,63 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 
+// Scroll progress is written straight to the DOM (no React state) so the
+// component never re-renders while the user scrolls — on low-end machines
+// a per-frame setState here was measurable jank.
 const ScrollToTop = () => {
-  const [scrollProgress, setScrollProgress] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
+  const boxRef = useRef(null)
+  const waterRef = useRef(null)
   const rafRef = useRef(null)
 
-  const handleScroll = useCallback(() => {
-    if (rafRef.current) return
-    rafRef.current = requestAnimationFrame(() => {
-      const scrollTop = window.pageYOffset
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      if (docHeight > 0) {
-        setScrollProgress((scrollTop / docHeight) * 100)
-      }
-      setIsVisible(scrollTop > 300)
-      rafRef.current = null
-    })
-  }, [])
-
   useEffect(() => {
+    const handleScroll = () => {
+      if (rafRef.current) return
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null
+        const box = boxRef.current
+        const water = waterRef.current
+        if (!box || !water) return
+
+        const scrollTop = window.pageYOffset
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
+
+        box.style.display = scrollTop > 300 ? 'block' : 'none'
+        water.style.transform = `translate(0px, ${100 - progress}%)`
+      })
+    }
+
     window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+
     return () => {
       window.removeEventListener('scroll', handleScroll)
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
-  }, [handleScroll])
+  }, [])
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    })
+    // Route through Lenis when it's active so the two scroll systems don't
+    // fight; fall back to the native API (reduced-motion sessions).
+    if (window.lenis) {
+      window.lenis.scrollTo(0)
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   return (
     <div
+      ref={boxRef}
       className="scrollToTop"
-      style={{ display: isVisible ? 'block' : 'none' }}
+      style={{ display: 'none' }}
       onClick={scrollToTop}
     >
       <div className="arrowUp">
         <i className="fa-light fa-arrow-up"></i>
       </div>
-      <div
-        className="water"
-        style={{ transform: `translate(0px, ${100 - scrollProgress}%)` }}
-      >
+      <div ref={waterRef} className="water" style={{ transform: 'translate(0px, 100%)' }}>
         <svg viewBox="0 0 560 20" className="water_wave water_wave_back">
           <use xlinkHref="#wave"></use>
         </svg>
