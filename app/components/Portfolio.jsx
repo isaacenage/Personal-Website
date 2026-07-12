@@ -1,7 +1,10 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useWorkCategory } from './work-category'
+import { WorkShowcase } from '@/components/ui/work-showcase'
+import { WorkViewToggle } from '@/components/ui/work-view-toggle'
 
 /* three/R3F only load when this page's chunk needs them; the placeholder
    fills the fullscreen stage so nothing shifts when the canvas mounts */
@@ -133,11 +136,32 @@ const Portfolio = () => {
   const activeCategory = useWorkCategory()
   const items = activeCategory === 'all' ? allItems : portfolioData[activeCategory]
 
+  /* plain state (not a work-category-style store): the toggle and both views
+     share this component tree. Grid unmounts the R3F canvas entirely. */
+  const [view, setView] = useState('galaxy')
+
+  /* No WebGL (blocked GPU, remote desktop, old hardware) used to mean a
+     black stage — the R3F canvas throws on mount. Probe once and strand
+     those visitors on the flat showcase instead, with no toggle back. */
+  const [webglOk, setWebglOk] = useState(true)
+  useEffect(() => {
+    const probe = document.createElement('canvas')
+    if (!probe.getContext('webgl2') && !probe.getContext('webgl')) {
+      setWebglOk(false)
+      setView('grid')
+    }
+  }, [])
+
   return (
     /* fullscreen stage: the gallery fills the viewport and the fixed header
        (z 100) floats above it */
     <section className="cosmic-work-stage" id="portfolio">
-      <StellarWorkGallery key={activeCategory} items={items} />
+      {view === 'galaxy' && webglOk ? (
+        <StellarWorkGallery key={activeCategory} items={items} />
+      ) : (
+        <WorkShowcase key={activeCategory} items={items} />
+      )}
+      {webglOk && <WorkViewToggle view={view} onChange={setView} />}
     </section>
   )
 }

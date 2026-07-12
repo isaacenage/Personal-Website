@@ -29,6 +29,8 @@ interface ThreeRefs {
   renderer: THREE.WebGLRenderer | null
   stars: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>[]
   nebula: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial> | null
+  galaxy: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial> | null
+  atmosphere: THREE.Mesh<THREE.SphereGeometry, THREE.ShaderMaterial> | null
   mountains: THREE.Mesh<THREE.ShapeGeometry, THREE.MeshBasicMaterial>[]
   animationId: number | null
   targetCameraX?: number
@@ -36,6 +38,12 @@ interface ThreeRefs {
   targetCameraZ?: number
   locations: number[]
 }
+
+// Galaxy palette — mirrors the cosmic theme tokens in cosmic-theme.css
+// (--star-white, --aurora-cyan, --nebula-violet).
+const GALAXY_CORE_COLOR = 0xf4f6ff
+const GALAXY_MID_COLOR = 0x6fe3ff
+const GALAXY_RIM_COLOR = 0x7c5cff
 
 export const Component = () => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -58,6 +66,8 @@ export const Component = () => {
     renderer: null,
     stars: [],
     nebula: null,
+    galaxy: null,
+    atmosphere: null,
     mountains: [],
     animationId: null,
     locations: [],
@@ -81,6 +91,17 @@ export const Component = () => {
       setIsReady(true)
       return
     }
+
+    // Shader time must be seconds-since-mount, never Date.now(): epoch
+    // seconds (~1.7e9) overflow mediump floats and exceed sin/cos range
+    // reduction on mobile GPUs, so every time-driven shader collapses to
+    // NaN there — stars vanish, and NaN nebula vertices rasterize as
+    // bright spikes shooting across the screen.
+    const clock = new THREE.Clock()
+
+    // One DPR value for the renderer and every point shader, so star
+    // sprite sizes stay consistent between desktop and high-DPI mobile.
+    const pixelRatio = Math.min(window.devicePixelRatio, 1.5)
 
     const createStarField = () => {
       const { current: refs } = threeRefs
@@ -128,24 +149,29 @@ export const Component = () => {
           uniforms: {
             time: { value: 0 },
             depth: { value: i },
+            uPixelRatio: { value: pixelRatio },
           },
           vertexShader: `
             attribute float size;
             varying vec3 vColor;
             uniform float time;
             uniform float depth;
+            uniform float uPixelRatio;
 
             void main() {
               vColor = color;
               vec3 pos = position;
 
-              // Slow rotation based on depth
-              float angle = time * 0.05 * (1.0 - depth * 0.3);
+              // Slow rotation based on depth. mod() keeps the angle small
+              // so sin/cos stay accurate on mobile GPU float precision.
+              float angle = mod(time * 0.05 * (1.0 - depth * 0.3), 6.28318530718);
               mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
               pos.xy = rot * pos.xy;
 
               vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-              gl_PointSize = size * (300.0 / -mvPosition.z);
+              // Clamp: floor keeps far stars visible on small high-DPI
+              // screens, ceiling stays inside mobile point-size limits.
+              gl_PointSize = clamp(size * uPixelRatio * (300.0 / -mvPosition.z), 1.0, 64.0);
               gl_Position = projectionMatrix * mvPosition;
             }
           `,
@@ -229,6 +255,113 @@ export const Component = () => {
       nebula.rotation.x = 0
       refs.scene.add(nebula)
       refs.nebula = nebula
+    }
+
+    // Spiral galaxy: a THREE.Points cloud on a logarithmic spiral, tinted
+    // core -> arms with the cosmic theme palette. It sits beyond the nebula
+    // so the deep-space camera legs (EXPLORE / CREATE) have a destination
+    // once the mountains recede.
+    const createGalaxy = () => {
+      const { current: refs } = threeRefs
+      if (!refs.scene) return
+
+      const count = 4000
+      const branches = 3
+      const radius = 500
+      const spin = 1.6
+      const randomnessPower = 2.5
+
+      const positions = new Float32Array(count * 3)
+      const colors = new Float32Array(count * 3)
+      const sizes = new Float32Array(count)
+
+      const coreColor = new THREE.Color(GALAXY_CORE_COLOR)
+      const midColor = new THREE.Color(GALAXY_MID_COLOR)
+      const rimColor = new THREE.Color(GALAXY_RIM_COLOR)
+
+      for (let i = 0; i < count; i++) {
+        const r = Math.pow(Math.random(), 1.5) * radius
+        const branchAngle = ((i % branches) / branches) * Math.PI * 2
+        const spinAngle = (r / radius) * spin * Math.PI
+
+        const scatter = () =>
+          Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1)
+
+        positions[i * 3] = Math.cos(branchAngle + spinAngle) * r + scatter() * 0.35 * r
+        positions[i * 3 + 1] = scatter() * 0.12 * r
+        positions[i * 3 + 2] = Math.sin(branchAngle + spinAngle) * r + scatter() * 0.35 * r
+
+        // Bright core fading through cyan into violet arms
+        const t = r / radius
+        const color = coreColor.clone()
+        if (t < 0.35) {
+          color.lerp(midColor, t / 0.35)
+        } else {
+          color.copy(midColor).lerp(rimColor, (t - 0.35) / 0.65)
+        }
+
+        colors[i * 3] = color.r
+        colors[i * 3 + 1] = color.g
+        colors[i * 3 + 2] = color.b
+
+        sizes[i] = (1 - t * 0.6) * (Math.random() * 3 + 2)
+      }
+
+      const geometry = new THREE.BufferGeometry()
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1))
+
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 },
+          uPixelRatio: { value: pixelRatio },
+        },
+        vertexShader: `
+          attribute float size;
+          varying vec3 vColor;
+          uniform float time;
+          uniform float uPixelRatio;
+
+          void main() {
+            vColor = color;
+            vec3 pos = position;
+
+            // Slow rigid rotation in the galactic plane; mod() keeps the
+            // angle inside mobile GPU sin/cos range.
+            float angle = mod(time * 0.03, 6.28318530718);
+            float c = cos(angle);
+            float s = sin(angle);
+            pos.xz = mat2(c, -s, s, c) * pos.xz;
+
+            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+            gl_PointSize = clamp(size * uPixelRatio * (400.0 / -mvPosition.z), 1.0, 48.0);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vColor;
+
+          void main() {
+            float dist = length(gl_PointCoord - vec2(0.5));
+            if (dist > 0.5) discard;
+
+            float opacity = (1.0 - smoothstep(0.15, 0.5, dist)) * 0.85;
+            gl_FragColor = vec4(vColor, opacity);
+          }
+        `,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        vertexColors: true,
+      })
+
+      const galaxy = new THREE.Points(geometry, material)
+      galaxy.position.set(0, 260, -1350)
+      galaxy.rotation.x = -1.05
+      galaxy.rotation.z = 0.25
+      refs.scene.add(galaxy)
+      refs.galaxy = galaxy
     }
 
     const createMountains = () => {
@@ -318,6 +451,7 @@ export const Component = () => {
 
       const atmosphere = new THREE.Mesh(geometry, material)
       refs.scene.add(atmosphere)
+      refs.atmosphere = atmosphere
     }
 
     const getLocation = () => {
@@ -329,7 +463,8 @@ export const Component = () => {
       const { current: refs } = threeRefs
       refs.animationId = requestAnimationFrame(animate)
 
-      const time = Date.now() * 0.001
+      const time = clock.getElapsedTime()
+      const TWO_PI = Math.PI * 2
 
       // Update stars
       refs.stars.forEach((starField) => {
@@ -338,9 +473,20 @@ export const Component = () => {
         }
       })
 
-      // Update nebula
+      // Nebula and atmosphere read time in fragment shaders, which run at
+      // fp16 on many mobile GPUs. Every use is sin(x + time)-periodic, so
+      // wrapping here is seamless and keeps the value in fp16 range.
       if (refs.nebula && refs.nebula.material.uniforms) {
-        refs.nebula.material.uniforms.time.value = time * 0.5
+        refs.nebula.material.uniforms.time.value = (time * 0.5) % TWO_PI
+      }
+
+      if (refs.galaxy && refs.galaxy.material.uniforms) {
+        refs.galaxy.material.uniforms.time.value = time
+      }
+
+      // sin(time * 2.0) in the atmosphere shader has period PI
+      if (refs.atmosphere && refs.atmosphere.material.uniforms) {
+        refs.atmosphere.material.uniforms.time.value = time % Math.PI
       }
 
       // Smooth camera movement with easing
@@ -401,13 +547,14 @@ export const Component = () => {
         powerPreference: 'high-performance',
       })
       refs.renderer.setSize(window.innerWidth, window.innerHeight)
-      refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
+      refs.renderer.setPixelRatio(pixelRatio)
       refs.renderer.toneMapping = THREE.ACESFilmicToneMapping
       refs.renderer.toneMappingExposure = 0.5
 
       // Create scene elements
       createStarField()
       createNebula()
+      createGalaxy()
       createMountains()
       createAtmosphere()
       getLocation()
@@ -486,6 +633,16 @@ export const Component = () => {
         refs.nebula.material.dispose()
       }
 
+      if (refs.galaxy) {
+        refs.galaxy.geometry.dispose()
+        refs.galaxy.material.dispose()
+      }
+
+      if (refs.atmosphere) {
+        refs.atmosphere.geometry.dispose()
+        refs.atmosphere.material.dispose()
+      }
+
       if (refs.renderer) {
         refs.renderer.dispose()
       }
@@ -493,6 +650,8 @@ export const Component = () => {
       refs.stars = []
       refs.mountains = []
       refs.nebula = null
+      refs.galaxy = null
+      refs.atmosphere = null
       refs.locations = []
     }
   }, [])

@@ -1464,6 +1464,76 @@ textarea.cosmic-input {
   overflow: hidden;
 }
 
+/* --- Our Work: flat showcase view (staggered photo grid + project list).
+   Scrolls inside the fullscreen stage; data-lenis-prevent on the element
+   keeps the wheel native here while Lenis owns the window scroll. Only
+   layout lives in CSS (media queries) — the stateful hover styling is
+   inline in components/ui/work-showcase.tsx. --- */
+.work-showcase {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: 132px 40px 120px;
+}
+
+.work-showcase-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 56px;
+}
+
+.work-showcase-grid {
+  flex: 1.35;
+  display: flex;
+  gap: 18px;
+}
+
+.work-showcase-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* magazine stagger: each column starts at a different height */
+.work-showcase-col:nth-child(1) {
+  padding-top: 44px;
+}
+.work-showcase-col:nth-child(3) {
+  padding-top: 88px;
+}
+
+.work-showcase-list {
+  flex: 1;
+  min-width: 300px;
+}
+
+@media (max-width: 899px) {
+  .work-showcase {
+    padding: 110px 20px 120px;
+  }
+
+  .work-showcase-inner {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* the component redistributes items into two columns below 900px */
+  .work-showcase-grid {
+    width: 100%;
+  }
+  .work-showcase-col:nth-child(1) {
+    padding-top: 32px;
+  }
+
+  .work-showcase-list {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 /* --- Insights: index/teaser cards --- */
 .cosmic-insight-card {
   display: flex;
