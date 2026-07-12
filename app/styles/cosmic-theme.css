@@ -389,7 +389,10 @@ body {
 }
 
 /* Outer container doubles as a hover bridge (padding-top, no background)
-   so the cursor never crosses a dead zone between trigger and panel. */
+   so the cursor never crosses a dead zone between trigger and panel.
+   No filter/drop-shadow anywhere on this subtree: an ancestor filter
+   becomes the backdrop root and blanks the panel's frosted-glass
+   backdrop-filter. */
 .cosmic-dropdown {
   position: absolute;
   top: 100%;
@@ -410,24 +413,156 @@ body {
   transform: translate(-50%, 0);
 }
 
+/* Panel colored like the header CTA (HudButton secondary/style1): a
+   fully transparent interior, the slate #8fa0bd outline, and the
+   button's top-lit slate sheen fading to nothing. ::before carries
+   the sheen and the button SVG's left-edge tick dots; ::after draws
+   the outline as an evenodd clip-path ring (outer chamfer minus the
+   same chamfer inset 1px) — the hollow-outline trick the button SVG
+   itself uses. The keyframes live in hud-button.css. */
 .cosmic-dropdown-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 216px;
-  padding: 14px 0;
-  border: 1px dashed var(--cosmic-dash);
-  background: rgba(5, 7, 15, 0.94);
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.55),
-    0 0 40px rgba(58, 107, 255, 0.1);
+  padding: 16px 0 14px;
 }
 
+.cosmic-dropdown-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 10px),
+    0 10px
+  );
+  background-image:
+    radial-gradient(circle at 2.5px 30px, rgba(143, 160, 189, 0.9) 1px, transparent 1.8px),
+    radial-gradient(circle at 2.5px 36px, rgba(143, 160, 189, 0.9) 1px, transparent 1.8px),
+    linear-gradient(
+      180deg,
+      rgba(143, 160, 189, 0.24),
+      rgba(143, 160, 189, 0.08) 55%,
+      rgba(143, 160, 189, 0) 95%
+    );
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Transparency opt-out: give the panel back a solid ink fill. */
+@media (prefers-reduced-transparency: reduce) {
+  .cosmic-dropdown-panel::before {
+    background-color: rgba(5, 7, 15, 0.96);
+  }
+}
+
+/* Hollow outline ring: the outer chamfer polygon minus the same
+   polygon inset 1px, joined with coincident bridge edges so evenodd
+   leaves only the 1px frame filled. */
+.cosmic-dropdown-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #8fa0bd;
+  clip-path: polygon(
+    evenodd,
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 10px),
+    0 10px,
+    10px 0,
+    11px 1px,
+    calc(100% - 11px) 1px,
+    calc(100% - 1px) 11px,
+    calc(100% - 1px) calc(100% - 11px),
+    calc(100% - 11px) calc(100% - 1px),
+    11px calc(100% - 1px),
+    1px calc(100% - 11px),
+    1px 11px,
+    11px 1px
+  );
+  pointer-events: none;
+}
+
+/* 2x2 corner dot cluster from the button chrome; lives on the hover
+   bridge because both panel pseudos are taken by the sheen + ring.
+   23px = the bridge's 14px padding + 9px inside the frame. */
+.cosmic-dropdown::after {
+  content: '';
+  position: absolute;
+  top: 23px;
+  right: 16px;
+  width: 2.5px;
+  height: 2.5px;
+  border-radius: 9999px;
+  background: #8fa0bd;
+  box-shadow:
+    -4.5px 0 0 #8fa0bd,
+    0 4.5px 0 #8fa0bd,
+    -4.5px 4.5px 0 #8fa0bd;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.cosmic-dropdown:hover::after {
+  transform: scale(1.25);
+}
+
+/* Each open re-runs the HUD entrance choreography: frame rises out of
+   a blur, the dot cluster pops, then the items cascade in like the
+   button label. Gated on .open/:focus-within so it restarts per open. */
+.cosmic-nav-group.open .cosmic-dropdown-panel,
+.cosmic-nav-group:focus-within .cosmic-dropdown-panel {
+  animation: hud-btn-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.cosmic-nav-group.open .cosmic-dropdown::after,
+.cosmic-nav-group:focus-within .cosmic-dropdown::after {
+  animation: hud-dot-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s backwards;
+}
+
+.cosmic-nav-group.open .cosmic-dropdown-panel > *,
+.cosmic-nav-group:focus-within .cosmic-dropdown-panel > * {
+  animation: hud-label-in 0.35s ease-out 0.08s backwards;
+}
+
+.cosmic-nav-group.open .cosmic-dropdown-panel > :nth-child(2),
+.cosmic-nav-group:focus-within .cosmic-dropdown-panel > :nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.cosmic-nav-group.open .cosmic-dropdown-panel > :nth-child(3),
+.cosmic-nav-group:focus-within .cosmic-dropdown-panel > :nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.cosmic-nav-group.open .cosmic-dropdown-panel > :nth-child(4),
+.cosmic-nav-group:focus-within .cosmic-dropdown-panel > :nth-child(4) {
+  animation-delay: 0.26s;
+}
+
+/* Items carry the .hud-btn-text weight and the secondary button's
+   label color — the panel is transparent, so haze-soft would wash out
+   over bright backdrops. position: relative both hosts the hover
+   marker and keeps them painting above the ::before sheen. */
 .cosmic-dropdown-panel a {
+  position: relative;
   padding: 11px 22px;
   font-size: 10.5px;
+  font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--haze-soft);
+  color: rgba(244, 246, 255, 0.78);
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.3s ease, background 0.3s ease;
@@ -442,6 +577,7 @@ body {
 /* Category filter items are <button>s — mirror the link styling, plus a
    reset because the template CSS stretches bare buttons to 100%. */
 .cosmic-dropdown-panel button {
+  position: relative;
   display: block;
   width: 100%;
   margin: 0;
@@ -452,9 +588,10 @@ body {
   text-align: left;
   padding: 11px 22px;
   font-size: 10.5px;
+  font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--haze-soft);
+  color: rgba(244, 246, 255, 0.78);
   white-space: nowrap;
   transition: color 0.3s ease, background 0.3s ease;
 }
@@ -463,6 +600,31 @@ body {
 .cosmic-dropdown-panel button.active {
   color: #fff;
   background: rgba(111, 227, 255, 0.06);
+}
+
+/* Hover marker echoing .hud-dot: springs in from nothing on the same
+   overshoot curve the button dots use. */
+.cosmic-dropdown-panel a::before,
+.cosmic-dropdown-panel button::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 9999px;
+  background: var(--aurora-cyan);
+  box-shadow: 0 0 6px rgba(111, 227, 255, 0.8);
+  transform: scale(0);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cosmic-dropdown-panel a:hover::before,
+.cosmic-dropdown-panel a.active::before,
+.cosmic-dropdown-panel button:hover::before,
+.cosmic-dropdown-panel button.active::before {
+  transform: scale(1);
 }
 
 /* Right-edge variant for the header's Category filter: the panel hugs the
@@ -500,6 +662,11 @@ body {
   flex-direction: column;
   gap: 6px;
   padding: 6px;
+  /* Chrome's block-level button sizing stretches an unsized display:flex
+     button to fill the header row, which paints the bars beside the logo
+     instead of at the right edge — shrink-wrap it so margin-left: auto
+     can pin it to the top-right corner. */
+  width: max-content;
   background: none;
   border: 0;
   cursor: pointer;
@@ -1492,5 +1659,20 @@ textarea.cosmic-input {
     opacity: 1;
     transform: none;
     animation: none !important;
+  }
+
+  .cosmic-nav-group.open .cosmic-dropdown-panel,
+  .cosmic-nav-group:focus-within .cosmic-dropdown-panel,
+  .cosmic-nav-group.open .cosmic-dropdown::after,
+  .cosmic-nav-group:focus-within .cosmic-dropdown::after,
+  .cosmic-nav-group.open .cosmic-dropdown-panel > *,
+  .cosmic-nav-group:focus-within .cosmic-dropdown-panel > * {
+    animation: none;
+  }
+
+  .cosmic-dropdown::after,
+  .cosmic-dropdown-panel a::before,
+  .cosmic-dropdown-panel button::before {
+    transition: none;
   }
 }

@@ -95,7 +95,7 @@ const portfolioData = {
       id: 1,
       title: 'Title Plotter PH',
       category: 'Tools',
-      image: '/assets/images/latest-portfolio/tpph.webp',
+      image: '/assets/images/latest-portfolio/titleplotter.webp',
       link: '/Tools/titleplotterph',
     },
     {
@@ -107,10 +107,10 @@ const portfolioData = {
     },
     {
       id: 3,
-      title: 'QGIS Plugins',
-      category: 'Open-Source Plugins',
-      image: '/assets/images/latest-portfolio/qgisplugins.webp',
-      link: 'https://qgis.byzenterra.org',
+      title: 'QGIS Dashboard',
+      category: 'Interactive Dashboards',
+      image: '/assets/images/latest-portfolio/qgisdashboard.webp',
+      link: 'https://qgis.byzenterra.org/qdashboards',
     },
     {
       id: 4,
