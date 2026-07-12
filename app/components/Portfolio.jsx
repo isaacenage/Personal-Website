@@ -35,14 +35,14 @@ const portfolioData = {
       id: 3,
       title: 'Impeach Sara Duterte',
       category: 'Provincial Signature Map',
-      image: '/assets/images/latest-portfolio/impeachsara.jpg',
+      image: '/assets/images/latest-portfolio/impeachsara.byzenterra.org_.png',
       link: 'https://impeachsara.byzenterra.org',
     },
     {
       id: 4,
       title: 'War on Drugs',
       category: 'EJK Dashboard',
-      image: '/assets/images/latest-portfolio/ejkmap.jpg',
+      image: '/assets/images/latest-portfolio/warondrugs.byzenterra.org_.png',
       link: 'https://warondrugs.byzenterra.org',
     },
     {
@@ -72,7 +72,7 @@ const portfolioData = {
       id: 2,
       title: 'byZenterra Portfolio',
       category: 'GIS Portfolio',
-      image: '/assets/images/latest-portfolio/zenterraportfolio.jpg',
+      image: '/assets/images/latest-portfolio/portfolio.byzenterra.org_.png',
       link: 'https://portfolio.byzenterra.org',
     },
     {
