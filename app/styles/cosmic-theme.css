@@ -208,8 +208,15 @@ body {
   font-weight: 300;
   letter-spacing: 0.04em;
   line-height: 1.85;
-  color: var(--haze);
+  color: #fff;
   max-width: 640px;
+}
+
+@media (max-width: 640px) {
+  .cosmic-desc {
+    font-size: 1.125rem;
+    line-height: 1.75;
+  }
 }
 
 .cosmic-head--center {
@@ -1388,7 +1395,13 @@ textarea.cosmic-input {
   font-size: 12px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--haze-soft);
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .cosmic-article-byline {
+    font-size: 13px;
+  }
 }
 
 .cosmic-article {
