@@ -1464,6 +1464,48 @@ textarea.cosmic-input {
   overflow: hidden;
 }
 
+/* --- Our Work: floating stage controls. The bottom edge is split into
+   three zones so nothing stacks: drag hint (galaxy only) bottom-left,
+   Galaxy/Grid toggle bottom-center, chat launcher bottom-right (fixed,
+   z 140, cosmic-chat.css). Positioning lives here — not inline — because
+   the mobile layout needs media queries. --- */
+.work-view-toggle {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+
+.work-drag-hint {
+  position: absolute;
+  left: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  /* The full-width hint would run under the centered toggle and the chat
+     launcher — recenter it above the toggle and drop the click half
+     (wrong verb on touch anyway). */
+  .work-drag-hint {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .work-drag-hint-extra {
+    display: none;
+  }
+}
+
+@media (pointer: coarse) {
+  /* 44px minimum touch target on touch screens */
+  .work-view-toggle button {
+    min-height: 44px;
+  }
+}
+
 /* --- Our Work: flat showcase view (staggered photo grid + project list).
    Scrolls inside the fullscreen stage; data-lenis-prevent on the element
    keeps the wheel native here while Lenis owns the window scroll. Only

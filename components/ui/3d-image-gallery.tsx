@@ -426,20 +426,20 @@ export function StellarWorkGallery({
         />
       </Canvas>
 
+      {/* positioning in cosmic-theme.css (.work-drag-hint): bottom-left on
+          desktop, recentered above the view toggle on small screens */}
       <div
         aria-hidden="true"
+        className="work-drag-hint"
         style={{
-          position: 'absolute',
-          left: 16,
-          bottom: 12,
-          pointerEvents: 'none',
           fontSize: 10,
           letterSpacing: '0.3em',
           textTransform: 'uppercase',
           color: 'rgba(244, 246, 255, 0.45)',
         }}
       >
-        Drag to explore &bull; Click a card
+        Drag to explore
+        <span className="work-drag-hint-extra"> &bull; Click a card</span>
       </div>
 
       {selected && <WorkModal item={selected} onClose={() => setSelected(null)} />}

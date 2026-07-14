@@ -3,10 +3,12 @@
 import React from 'react'
 import { ACCENT, chamferClip } from './work-modal'
 
-/* Segmented Galaxy/Grid switch pinned to the Our Work stage, bottom-right —
-   the counterpart of the "Drag to explore" hint at bottom-left. Chamfered
-   plate in the HUD language: translucent ink fill, 1px accent outline via
-   the layered-clip trick, accent-filled active segment. */
+/* Segmented Galaxy/Grid switch pinned to the Our Work stage, bottom-center —
+   clear of the drag hint (bottom-left) and the fixed chat launcher
+   (bottom-right). Positioning is in cosmic-theme.css (.work-view-toggle);
+   only the HUD skin lives inline: chamfered plate, translucent ink fill,
+   1px accent outline via the layered-clip trick, accent-filled active
+   segment. */
 
 export type WorkView = 'galaxy' | 'grid'
 
@@ -26,11 +28,8 @@ export function WorkViewToggle({
     <div
       role="group"
       aria-label="Gallery view"
+      className="work-view-toggle"
       style={{
-        position: 'absolute',
-        right: 16,
-        /* the stage bottom hugs the mobile browser chrome — keep clear */
-        bottom: 'calc(10px + env(safe-area-inset-bottom, 0px))',
         clipPath: chamferClip(8),
         background: 'rgba(111, 227, 255, 0.35)',
         padding: 1,
