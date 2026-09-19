@@ -90,7 +90,7 @@ const portfolioData = {
       title: 'J&J Spotless Cleaning',
       category: 'Client Website',
       image: '/assets/images/latest-portfolio/jjspotless.webp',
-      link: 'https://jjspotless.vercel.app/',
+      link: '/jjspotless/',
     },
   ],
   tools: [
