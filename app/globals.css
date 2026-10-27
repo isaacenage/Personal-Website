@@ -646,9 +646,19 @@ a {
     top: 50%;
     transform: translateY(-50%);
     display: grid;
-    gap: 8px;
     padding: 8px;
     border-radius: var(--r-pill);
+    /* the link discs live in the rail's own background, under the pill;
+       one 44px disc per 52px (link + gap) */
+    background-image: radial-gradient(circle at 22px 22px, var(--paper-3) 21.5px, transparent 22px);
+    background-position: 8px 8px;
+    background-size: 44px 52px;
+    background-repeat: repeat-y;
+  }
+  .rail-links {
+    position: relative;
+    display: grid;
+    gap: 8px;
   }
   .rail a {
     position: relative;
@@ -657,13 +667,30 @@ a {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: var(--paper-3);
     color: var(--ink);
-    transition: background-color 180ms ease;
   }
   .rail a[aria-current='page'] {
-    background: var(--ink);
+    anchor-name: --rail-active;
     color: var(--on-dark);
+  }
+  /* same anchored pill as the notch, sliding between discs */
+  .rail-pill {
+    position: absolute;
+    position-anchor: --rail-active;
+    top: anchor(top);
+    left: anchor(left);
+    width: anchor-size(width);
+    height: anchor-size(height);
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  @supports not (anchor-name: --a) {
+    .rail-pill {
+      display: none;
+    }
+    .rail a[aria-current='page'] {
+      background: var(--ink);
+    }
   }
   .rail a span {
     position: absolute;
@@ -1111,6 +1138,12 @@ a {
     display: grid;
     view-transition-name: rail;
   }
+  .rail-pill {
+    view-transition-name: rail-active;
+  }
+  .rail-links {
+    view-transition-name: rail-links;
+  }
   .corner-pill.brand {
     view-transition-name: brand;
   }
@@ -1449,6 +1482,13 @@ a {
   display: none;
 }
 ::view-transition-new(notch-links) {
+  animation-name: none;
+}
+/* rail icons never move; their ink/white swaps as the pill passes */
+::view-transition-old(rail-links) {
+  animation: vt-lift 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+::view-transition-new(rail-links) {
   animation-name: none;
 }
 /* same section: identical labels, only their ink/white swaps as the pill

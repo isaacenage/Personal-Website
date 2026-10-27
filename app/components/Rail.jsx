@@ -27,18 +27,20 @@ export default function Rail() {
   const at = ITEMS.findIndex((it) => it.href === current)
   return (
     <nav className="rail glass" aria-label="Sections">
-      {ITEMS.map(({ href, label, icon: Icon }, i) => (
-        <Link
-          key={href}
-          href={href}
-          data-nav={i > at ? 'down' : i < at ? 'up' : undefined}
-          aria-current={current === href ? 'page' : undefined}
-          style={current === href ? { viewTransitionName: 'rail-active' } : undefined}
-        >
-          <Icon size={20} aria-hidden />
-          <span>{label}</span>
-        </Link>
-      ))}
+      <span className="rail-pill" aria-hidden="true" />
+      <div className="rail-links">
+        {ITEMS.map(({ href, label, icon: Icon }, i) => (
+          <Link
+            key={href}
+            href={href}
+            data-nav={i > at ? 'down' : i < at ? 'up' : undefined}
+            aria-current={current === href ? 'page' : undefined}
+          >
+            <Icon size={20} aria-hidden />
+            <span>{label}</span>
+          </Link>
+        ))}
+      </div>
     </nav>
   )
 }
