@@ -598,8 +598,7 @@ a {
 }
 @keyframes panel-in {
   from {
-    opacity: 0;
-    transform: scale(0.97) translateY(-6px);
+    transform: scale(0.9);
   }
 }
 @media (min-width: 1000px) {
@@ -1326,19 +1325,28 @@ a {
 
 @keyframes preview-in {
   from {
-    opacity: 0;
-    transform: translateY(6px);
+    transform: scale(0.92);
   }
 }
 
-/* ---------- Route morphs (View Transitions API) ---------- */
+/* ---------- Route morphs (View Transitions API) ----------
+   Transform-only, compositor-thread. Nothing fades in: the new view expands
+   (or slides, by nav axis) underneath while the old one leaves on top. */
 ::view-transition-group(*) {
   animation-duration: 300ms;
   animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
 ::view-transition-old(*),
 ::view-transition-new(*) {
-  animation-duration: 200ms;
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+::view-transition-old(*) {
+  z-index: 1;
+  animation-name: vt-out;
+}
+::view-transition-new(*) {
+  animation-name: vt-expand;
 }
 ::view-transition-old(page-panel),
 ::view-transition-new(page-panel),
@@ -1350,10 +1358,58 @@ a {
   object-fit: cover;
   object-position: top left;
 }
-::view-transition-old(frame-bg),
-::view-transition-new(frame-bg) {
-  animation-duration: 300ms;
+/* Directional rules sit at zero specificity (:where), so the named rules
+   below still win for chrome that must not travel. */
+/* notch: pages travel sideways */
+:where(html[data-nav='right'])::view-transition-old(*) { animation-name: vt-out-left; }
+:where(html[data-nav='right'])::view-transition-new(*) { animation-name: vt-in-right; }
+:where(html[data-nav='left'])::view-transition-old(*) { animation-name: vt-out-right; }
+:where(html[data-nav='left'])::view-transition-new(*) { animation-name: vt-in-left; }
+/* rail: sections stack vertically */
+:where(html[data-nav='down'])::view-transition-old(*) { animation-name: vt-out-up; }
+:where(html[data-nav='down'])::view-transition-new(*) { animation-name: vt-in-down; }
+:where(html[data-nav='up'])::view-transition-old(*) { animation-name: vt-out-down; }
+:where(html[data-nav='up'])::view-transition-new(*) { animation-name: vt-in-up; }
+/* unchanged chrome: the group glides, the image stays put */
+::view-transition-old(rail),
+::view-transition-new(rail),
+::view-transition-old(brand),
+::view-transition-new(brand),
+::view-transition-old(top-cta),
+::view-transition-new(top-cta),
+::view-transition-old(frame-foot),
+::view-transition-new(frame-foot),
+::view-transition-old(rail-active),
+::view-transition-new(rail-active),
+::view-transition-old(nav-active),
+::view-transition-new(nav-active) {
+  animation-name: none;
 }
+/* the notch only expands; it never travels */
+::view-transition-old(notch) { animation-name: vt-out; }
+::view-transition-new(notch) { animation-name: vt-expand; }
+/* full-bleed layers can't scale without exposing edges: the new one sits
+   still and the old one lifts off it */
+::view-transition-old(root),
+::view-transition-old(frame-bg) {
+  animation-name: vt-lift;
+}
+::view-transition-new(root),
+::view-transition-new(frame-bg) {
+  animation-name: none;
+}
+
+@keyframes vt-lift { to { opacity: 0; } }
+@keyframes vt-expand { from { transform: scale(0.9); } }
+@keyframes vt-out { to { transform: scale(1.04); opacity: 0; } }
+@keyframes vt-in-right { from { transform: translateX(18%) scale(0.9); } }
+@keyframes vt-in-left { from { transform: translateX(-18%) scale(0.9); } }
+@keyframes vt-in-down { from { transform: translateY(18%) scale(0.9); } }
+@keyframes vt-in-up { from { transform: translateY(-18%) scale(0.9); } }
+@keyframes vt-out-left { to { transform: translateX(-18%) scale(0.9); opacity: 0; } }
+@keyframes vt-out-right { to { transform: translateX(18%) scale(0.9); opacity: 0; } }
+@keyframes vt-out-up { to { transform: translateY(-18%) scale(0.9); opacity: 0; } }
+@keyframes vt-out-down { to { transform: translateY(18%) scale(0.9); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
   ::view-transition-old(*),

@@ -23,6 +23,7 @@ export default function Header() {
   const route = routeOf(pathname)
   const section = sectionOf(route)
   const pages = section?.pages.length > 1 ? section.pages : []
+  const at = pages.findIndex((p) => p.href === route)
 
   return (
     <header className="frame-top">
@@ -32,10 +33,11 @@ export default function Header() {
 
       {pages.length > 0 && (
         <nav className="notch" aria-label={`${section.label} pages`}>
-          {pages.map((p) => (
+          {pages.map((p, i) => (
             <Link
               key={p.href}
               href={p.href}
+              data-nav={i > at ? 'right' : i < at ? 'left' : undefined}
               aria-current={route === p.href ? 'page' : undefined}
               style={route === p.href ? { viewTransitionName: 'nav-active' } : undefined}
             >

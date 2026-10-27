@@ -31,6 +31,21 @@ export default function Shell({ children }) {
     else setTimeout(warm, 1500)
   }, [])
 
+  // Route morph direction: the notch slides pages sideways, the rail stacks
+  // sections vertically, everything else expands in. Capture phase so it is
+  // set before the Link starts the view transition.
+  useEffect(() => {
+    const root = document.documentElement
+    const onClick = (e) => (root.dataset.nav = e.target.closest?.('a[data-nav]')?.dataset.nav || '')
+    const onPop = () => (root.dataset.nav = '')
+    document.addEventListener('click', onClick, true)
+    addEventListener('popstate', onPop)
+    return () => {
+      document.removeEventListener('click', onClick, true)
+      removeEventListener('popstate', onPop)
+    }
+  }, [])
+
   return (
     <div className="frame">
       <div className="frame-clip" aria-hidden="true">

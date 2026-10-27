@@ -24,12 +24,14 @@ const ITEMS = [
 /* Vertical section rail on the frame's left edge, desktop only. */
 export default function Rail() {
   const current = sectionOf(routeOf(usePathname()))?.href
+  const at = ITEMS.findIndex((it) => it.href === current)
   return (
     <nav className="rail glass" aria-label="Sections">
-      {ITEMS.map(({ href, label, icon: Icon }) => (
+      {ITEMS.map(({ href, label, icon: Icon }, i) => (
         <Link
           key={href}
           href={href}
+          data-nav={i > at ? 'down' : i < at ? 'up' : undefined}
           aria-current={current === href ? 'page' : undefined}
           style={current === href ? { viewTransitionName: 'rail-active' } : undefined}
         >
