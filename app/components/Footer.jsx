@@ -45,7 +45,12 @@ export default function Footer() {
               </a>
               {i < all.length - 1 ? ', ' : '.'}
             </span>
-          ))}
+          ))}{' '}
+          Work mockups use the{' '}
+          <a href="https://sketchfab.com/3d-models/iphone-17-pro-4541aa8a28324b33a2baaf81d263aaec" rel="noopener noreferrer">
+            iPhone 17 Pro model by Ranguel
+          </a>{' '}
+          (CC BY 4.0) via Phone Mockup Studio, and devices.css.
         </p>
       </div>
     </footer>
