@@ -476,8 +476,6 @@ a {
   left: 50%;
   transform: translateX(-50%);
   display: none;
-  align-items: center;
-  gap: 4px;
   padding: 4px 16px 12px;
   background: var(--paper-3);
   border-radius: 0 0 var(--notch-r) var(--notch-r);
@@ -498,6 +496,11 @@ a {
   left: 100%;
   background: radial-gradient(circle at 100% 100%, transparent calc(var(--notch-r) - 0.5px), var(--paper-3) var(--notch-r));
 }
+.notch-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 .notch a {
   padding: 12px 16px;
   border-radius: var(--r-pill);
@@ -506,6 +509,10 @@ a {
   font-size: 0.9375rem;
   font-weight: 500;
   transition: background-color 180ms ease;
+}
+/* the hover tint must not trail the old active pill through a route morph */
+:active-view-transition .notch a {
+  transition: none;
 }
 .notch a[aria-current='page'] {
   background: var(--ink);
@@ -1067,6 +1074,9 @@ a {
     display: inline-flex;
     view-transition-name: notch;
   }
+  .notch-links {
+    view-transition-name: notch-links;
+  }
   /* the rail takes over section switching */
   .mobile-nav {
     display: none;
@@ -1381,13 +1391,38 @@ a {
 ::view-transition-new(frame-foot),
 ::view-transition-old(rail-active),
 ::view-transition-new(rail-active),
-::view-transition-old(nav-active),
+::view-transition-old(notch),
+::view-transition-new(notch),
 ::view-transition-new(nav-active) {
   animation-name: none;
 }
-/* the notch only expands; it never travels */
-::view-transition-old(notch) { animation-name: vt-out; }
-::view-transition-new(notch) { animation-name: vt-expand; }
+/* The notch is split so its width can morph without scaling text: the shell
+   (an empty pill) stretches with the group at a fixed height, the labels and
+   the active pill keep their pixel size and the old ones lift off. */
+::view-transition-old(notch),
+::view-transition-new(notch) {
+  height: 100%;
+}
+::view-transition-old(notch-links),
+::view-transition-new(notch-links),
+::view-transition-old(nav-active),
+::view-transition-new(nav-active) {
+  width: 100%;
+  height: 100%;
+  object-fit: none;
+}
+::view-transition-group(nav-active) {
+  overflow: clip;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+}
+::view-transition-old(notch-links),
+::view-transition-old(nav-active) {
+  animation: vt-lift 160ms ease-out;
+}
+::view-transition-new(notch-links) {
+  animation-name: none;
+}
 /* full-bleed layers can't scale without exposing edges: the new one sits
    still and the old one lifts off it */
 ::view-transition-old(root),
