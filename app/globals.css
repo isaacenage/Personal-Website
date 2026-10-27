@@ -304,9 +304,6 @@ a {
   .btn-quiet:hover {
     border-color: var(--ink);
   }
-  .btn:hover .dot {
-    transform: rotate(45deg);
-  }
 }
 .actions {
   display: flex;
@@ -318,6 +315,16 @@ a {
     flex: 1 1 100%;
     justify-content: space-between;
   }
+}
+
+/* hugeicons-animated wrapper; arrows in dots and circles keep a bolder stroke */
+.hi {
+  display: inline-flex;
+  flex: none;
+}
+.dot .hi path,
+.circle .hi path {
+  stroke-width: 2;
 }
 
 /* round arrow button used on cards */
@@ -545,10 +552,12 @@ a {
   background: var(--paper-3);
   color: var(--ink);
   box-shadow: var(--glass-shadow);
+  max-height: calc(100svh - 96px);
+  overflow: auto;
   animation: panel-in 220ms var(--ease-out);
   transform-origin: top right;
 }
-.mobile-panel a:not(.btn) {
+.mobile-panel .mobile-section > a {
   display: block;
   padding: 16px 0;
   border-bottom: 1px solid var(--line);
@@ -556,6 +565,31 @@ a {
   text-decoration: none;
   font-size: 1.125rem;
   font-weight: 500;
+}
+/* the current section's pages, as chips under its link */
+.mobile-panel .mobile-section > a:has(+ .mobile-sub) {
+  padding-bottom: 4px;
+  border-bottom: 0;
+}
+.mobile-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+.mobile-sub a {
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  background: var(--paper-2);
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.mobile-sub a[aria-current='page'] {
+  background: var(--ink);
+  color: var(--on-dark);
 }
 .mobile-panel .btn {
   width: 100%;
@@ -569,12 +603,8 @@ a {
   }
 }
 @media (min-width: 1000px) {
-  .notch,
   .top-cta {
     display: inline-flex;
-  }
-  .mobile-nav {
-    display: none;
   }
 }
 
@@ -924,23 +954,42 @@ a {
   display: none;
 }
 
-/* CSS-only tabs on About */
-.tab-input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
+/* the process stages at panel size, and the included-with-every-project list */
+.mini-steps--lg {
+  gap: 28px;
 }
-.tab-labels {
-  display: none;
+.mini-steps--lg li {
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 4px 16px;
+  font-size: 1rem;
 }
-.tab-body + .tab-body {
-  margin-top: 32px;
+.mini-steps--lg li::before {
+  width: 44px;
+  height: 44px;
+  font-size: 1.125rem;
 }
-.tab-title {
+.mini-steps--lg strong {
+  font-family: var(--font-display);
   font-size: var(--fs-title);
   font-weight: 500;
-  margin-bottom: 12px;
 }
+.checks {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 16px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+  font-size: 0.9375rem;
+  color: var(--ink-2);
+}
+.checks li::before {
+  content: '✓';
+  margin-right: 8px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .pairs {
   display: grid;
   gap: 0;
@@ -1018,6 +1067,10 @@ a {
   .notch {
     display: inline-flex;
     view-transition-name: notch;
+  }
+  /* the rail takes over section switching */
+  .mobile-nav {
+    display: none;
   }
   .rail {
     display: grid;
@@ -1200,11 +1253,12 @@ a {
     border: 1px solid var(--glass-edge);
     background: var(--thumb-wash);
   }
+  /* a transparent monitor + phone mockup; contain it above the glass foot */
   .preview img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: top;
+    padding: 16px 16px 88px;
+    object-fit: contain;
     animation: preview-in 260ms var(--ease-out);
   }
   .preview-foot {
@@ -1267,45 +1321,6 @@ a {
     left: 0;
     bottom: 32px;
     min-height: 0;
-  }
-
-  /* About tabs: one panel, switched by CSS */
-  .tab-labels {
-    display: inline-flex;
-  }
-  .tab-title {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-  .tab-body {
-    display: none;
-    animation: preview-in 260ms var(--ease-out);
-  }
-  .tab-body + .tab-body {
-    margin-top: 0;
-  }
-  #tab-who:checked ~ .tab-body--who,
-  #tab-values:checked ~ .tab-body--values,
-  #tab-industries:checked ~ .tab-body--industries,
-  #tab-company:checked ~ .tab-body--company {
-    display: block;
-  }
-  #tab-who:checked ~ .tab-labels label[for='tab-who'],
-  #tab-values:checked ~ .tab-labels label[for='tab-values'],
-  #tab-industries:checked ~ .tab-labels label[for='tab-industries'],
-  #tab-company:checked ~ .tab-labels label[for='tab-company'] {
-    background: var(--ink);
-    color: var(--on-dark);
-  }
-  #tab-who:focus-visible ~ .tab-labels label[for='tab-who'],
-  #tab-values:focus-visible ~ .tab-labels label[for='tab-values'],
-  #tab-industries:focus-visible ~ .tab-labels label[for='tab-industries'],
-  #tab-company:focus-visible ~ .tab-labels label[for='tab-company'] {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
   }
 }
 

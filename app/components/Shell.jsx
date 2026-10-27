@@ -4,10 +4,10 @@ import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Header from './Header'
 import Rail from './Rail'
-import { PHOTOS, ROUTE_PHOTO } from '@/lib/site'
+import { PHOTOS, ROUTE_PHOTO, routeOf, sectionOf } from '@/lib/site'
 
-export const routeOf = (pathname) => pathname.replace(/\/+$/, '') || '/'
-export const photoFor = (pathname) => PHOTOS[ROUTE_PHOTO[routeOf(pathname)]]
+// a section's pages share its photograph
+export const photoFor = (pathname) => PHOTOS[ROUTE_PHOTO[sectionOf(routeOf(pathname))?.href]]
 
 /* The persistent window. On desktop it is fixed to the viewport and only its
    contents change between routes (the View Transitions API morphs the shared

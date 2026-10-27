@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr'
+import { ArrowUpRight01Icon } from '@/app/components/icons/arrow-up-right-01'
 import { useEmailJS } from '../hooks/useEmailJS'
 import { SERVICES } from '@/lib/site'
 
@@ -71,7 +71,7 @@ export default function ContactForm() {
       <button type="submit" className="btn btn-primary" disabled={isLoading}>
         {isLoading ? 'Sending…' : 'Send message'}
         <span className="dot" aria-hidden="true">
-          <ArrowUpRight size={18} weight="bold" />
+          <ArrowUpRight01Icon size={18} />
         </span>
       </button>
       <p className={`status ${isError ? 'status--error' : 'status--ok'}`} role="status" aria-live="polite">

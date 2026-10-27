@@ -1,16 +1,17 @@
 import { Link } from 'next-view-transitions'
-import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr'
-import { COMPANY, PHOTOS, ROUTE_PHOTO } from '@/lib/site'
+import { ArrowUpRight01Icon } from '@/app/components/icons/arrow-up-right-01'
+import { COMPANY, PHOTOS, ROUTE_PHOTO, WORK_GROUPS } from '@/lib/site'
 
 /* Shared building blocks used across pages. Every screen is built from the
    same named parts (lead, panel, card, tuck), so a route change morphs them
    from one layout into the next. */
 
-const KIND = { commissions: 'Commission', opensource: 'Open source', dataviz: 'Data viz', side: 'Side project' }
 export const external = (href) =>
   href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {}
 
-export const Arrow = ({ size = 18 }) => <ArrowUpRight size={size} weight="bold" aria-hidden />
+export const kindOf = (item) => WORK_GROUPS[item.group].kind
+
+export const Arrow = ({ size = 18 }) => <ArrowUpRight01Icon size={size} aria-hidden />
 
 /* A screen: one per route. `layout` picks the desktop composition. */
 export const Screen = ({ layout, children }) => (
@@ -49,7 +50,7 @@ export const ProjectIndex = ({ items }) => (
             <strong>{item.title}</strong>
             <span>{item.category}</span>
           </span>
-          <span className="kind">{KIND[item.group]}</span>
+          <span className="kind">{kindOf(item)}</span>
           <span className="circle">
             <Arrow />
           </span>
@@ -59,7 +60,6 @@ export const ProjectIndex = ({ items }) => (
   </ul>
 )
 
-export const kindOf = (item) => KIND[item.group]
 
 /* Phone-only closing band; desktop has the Contact screen instead. */
 export const Close = ({ title = 'Tell us what you are mapping.' }) => (

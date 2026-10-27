@@ -1,6 +1,5 @@
-import { Plus } from '@phosphor-icons/react/dist/ssr'
 import { Screen, Lead, Close, BtnArrow } from '../components/blocks'
-import { TIERS, FAQ } from '@/lib/site'
+import { TIERS, INCLUDED } from '@/lib/site'
 
 export const metadata = {
   title: 'Pricing',
@@ -39,18 +38,14 @@ export default function PricingPage() {
           </div>
         </section>
 
-        <section className="float-card vt-card glass faq" aria-label="Common questions">
-          <h2>Common questions</h2>
-          {FAQ.map((item) => (
-            <details key={item.q}>
-              <summary>
-                {item.q}
-                <Plus size={18} aria-hidden />
-              </summary>
-              <p>{item.a}</p>
-            </details>
-          ))}
-        </section>
+        <article className="float-card vt-card glass">
+          <h2>Every tier includes</h2>
+          <ul className="checks">
+            {INCLUDED.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </article>
       </Screen>
       <Close title="Need a quote?" />
     </>

@@ -1,6 +1,6 @@
-import { Link } from 'next-view-transitions'
-import { Screen, Lead, Arrow } from '../components/blocks'
-import { getAllPosts, formatPostDate } from '@/lib/blog'
+import { Screen, Lead } from '../components/blocks'
+import PostList from './PostList'
+import { getAllPosts } from '@/lib/blog'
 
 export const metadata = {
   title: 'Insights',
@@ -8,8 +8,6 @@ export const metadata = {
 }
 
 export default function InsightsPage() {
-  const posts = getAllPosts()
-
   return (
     <Screen layout="split">
       <Lead
@@ -17,24 +15,7 @@ export default function InsightsPage() {
         title="Insights"
         lead="What we learn while mapping, measuring and building, written down."
       />
-      <section className="panel vt-panel" aria-label="Articles">
-        <div className="post-list">
-          {posts.map((post) => (
-            <Link key={post.slug} href={`/insights/${post.slug}`} className="post-item">
-              <div>
-                <h2>{post.title}</h2>
-                <p>{post.excerpt}</p>
-                <span className="meta">
-                  {post.category}, {formatPostDate(post.date)}
-                </span>
-              </div>
-              <span className="circle">
-                <Arrow />
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <PostList posts={getAllPosts()} />
     </Screen>
   )
 }

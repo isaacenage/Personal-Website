@@ -2,31 +2,19 @@
 
 import { useState } from 'react'
 import { Arrow, external, kindOf } from './blocks'
-import { WORK, WORK_FILTERS } from '@/lib/site'
+import { WORK } from '@/lib/site'
 
 /* Desktop: the project list in the panel, the hovered or focused project
-   previewed large in the card. Phones get the list only. */
-export default function WorkBrowser() {
-  const [filter, setFilter] = useState('all')
-  const items = filter === 'all' ? WORK : WORK.filter((w) => w.group === filter)
-  const [active, setActive] = useState(WORK[0])
+   previewed large in the card. Phones get the list only. `group` narrows
+   the list to one work group; the notch links between them. */
+export default function WorkBrowser({ group }) {
+  const items = group ? WORK.filter((w) => w.group === group) : WORK
+  const [active, setActive] = useState(items[0])
   const shown = items.includes(active) ? active : items[0]
 
   return (
     <>
       <section className="panel vt-panel" aria-label="Projects">
-        <div className="segmented" role="group" aria-label="Filter projects">
-          {WORK_FILTERS.map((f) => (
-            <button
-              key={f.key}
-              type="button"
-              aria-pressed={filter === f.key}
-              onClick={() => setFilter(f.key)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
         <ul className="index index--compact">
           {items.map((item) => (
             <li key={item.title}>
@@ -53,7 +41,7 @@ export default function WorkBrowser() {
       </section>
 
       <article className="preview vt-card" aria-live="polite">
-        <img key={shown.image} src={shown.image} alt={`${shown.title} screenshot`} width="800" height="500" />
+        <img key={shown.preview} src={shown.preview} alt={`${shown.title} on desktop and phone`} width="1600" height="1000" />
         <div className="preview-foot glass">
           <div>
             <h2>{shown.title}</h2>

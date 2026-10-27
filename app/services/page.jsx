@@ -1,5 +1,5 @@
 import { Screen, Lead, Close } from '../components/blocks'
-import { SERVICES, PROCESS } from '@/lib/site'
+import { SERVICES } from '@/lib/site'
 
 export const metadata = {
   title: 'Services',
@@ -24,18 +24,6 @@ export default function ServicesPage() {
                 <h2>{s.title}</h2>
                 <p>{s.short}</p>
                 <p className="small">{s.deliverables.join(', ')}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section className="float-card vt-card glass" aria-label="How a project runs">
-          <h2>How a project runs</h2>
-          <ol className="mini-steps">
-            {PROCESS.map((step) => (
-              <li key={step.title}>
-                <strong>{step.title}</strong>
-                <span>{step.body}</span>
               </li>
             ))}
           </ol>

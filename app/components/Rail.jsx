@@ -2,36 +2,36 @@
 
 import { Link } from 'next-view-transitions'
 import { usePathname } from 'next/navigation'
-import {
-  House,
-  MapTrifold,
-  StackSimple,
-  Tag,
-  Article,
-  EnvelopeSimple,
-} from '@phosphor-icons/react/dist/ssr'
-import { isActive } from './Header'
+import { Home01Icon } from '@/app/components/icons/home-01'
+import { EarthIcon } from '@/app/components/icons/earth'
+import { Layers01Icon } from '@/app/components/icons/layers-01'
+import { Tag01Icon } from '@/app/components/icons/tag-01'
+import { InformationCircleIcon } from '@/app/components/icons/information-circle'
+import { File01Icon } from '@/app/components/icons/file-01'
+import { Mail01Icon } from '@/app/components/icons/mail-01'
+import { sectionOf, routeOf } from '@/lib/site'
 
 const ITEMS = [
-  { href: '/', label: 'Home', icon: House },
-  { href: '/work', label: 'Work', icon: MapTrifold },
-  { href: '/services', label: 'Services', icon: StackSimple },
-  { href: '/pricing', label: 'Pricing', icon: Tag },
-  { href: '/insights', label: 'Insights', icon: Article },
-  { href: '/contact', label: 'Contact', icon: EnvelopeSimple },
+  { href: '/', label: 'Home', icon: Home01Icon },
+  { href: '/work', label: 'Work', icon: EarthIcon },
+  { href: '/services', label: 'Services', icon: Layers01Icon },
+  { href: '/pricing', label: 'Pricing', icon: Tag01Icon },
+  { href: '/about', label: 'About', icon: InformationCircleIcon },
+  { href: '/insights', label: 'Insights', icon: File01Icon },
+  { href: '/contact', label: 'Contact', icon: Mail01Icon },
 ]
 
-/* Vertical shortcut rail on the frame's left edge, desktop only. */
+/* Vertical section rail on the frame's left edge, desktop only. */
 export default function Rail() {
-  const pathname = usePathname()
+  const current = sectionOf(routeOf(usePathname()))?.href
   return (
-    <nav className="rail glass" aria-label="Shortcuts">
+    <nav className="rail glass" aria-label="Sections">
       {ITEMS.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
           href={href}
-          aria-current={isActive(pathname, href) ? 'page' : undefined}
-          style={isActive(pathname, href) ? { viewTransitionName: 'rail-active' } : undefined}
+          aria-current={current === href ? 'page' : undefined}
+          style={current === href ? { viewTransitionName: 'rail-active' } : undefined}
         >
           <Icon size={20} aria-hidden />
           <span>{label}</span>

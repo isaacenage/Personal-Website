@@ -1,17 +1,12 @@
 import { Link } from 'next-view-transitions'
-import { Compass, MapPin, Printer, Ruler } from '@phosphor-icons/react/dist/ssr'
+import { CompassIcon } from '@/app/components/icons/compass'
+import { Location01Icon } from '@/app/components/icons/location-01'
+import { PrinterIcon } from '@/app/components/icons/printer'
+import { GridViewIcon } from '@/app/components/icons/grid-view'
 import { Screen, Lead, Arrow, BtnArrow, ProjectIndex, Close, external } from './components/blocks'
-import { SERVICES, WORK, SECTORS, PROCESS, COMPANY, PHOTOS, ORG_TYPES, TIMELINES } from '@/lib/site'
+import { SERVICES, WORK, FEATURED, SECTORS, PROCESS, COMPANY, PHOTOS, ORG_TYPES, TIMELINES } from '@/lib/site'
 
 const find = (title) => WORK.find((w) => w.title === title)
-const SELECTED = [
-  'Anu Na, Meralco?',
-  'Pasig Sagip',
-  'PH Geospatial Downloader',
-  'QGIS Dashboard',
-  "Joe's Commercial Cleaning",
-  'UPD Cartography',
-].map(find)
 const meralco = find('Anu Na, Meralco?')
 const sagip = find('Pasig Sagip')
 
@@ -93,15 +88,15 @@ export default function Home() {
           </p>
           <ul className="specs">
             <li>
-              <MapPin size={20} aria-hidden />
+              <Location01Icon size={20} aria-hidden />
               Tie point
             </li>
             <li>
-              <Ruler size={20} aria-hidden />
+              <GridViewIcon size={20} aria-hidden />
               Area, misclosure
             </li>
             <li>
-              <Printer size={20} aria-hidden />
+              <PrinterIcon size={20} aria-hidden />
               Print report
             </li>
           </ul>
@@ -230,7 +225,7 @@ export default function Home() {
                       {...external(sagip.link)}
                       aria-label={`Open ${sagip.title}`}
                     >
-                      <Compass size={20} weight="bold" aria-hidden />
+                      <CompassIcon size={20} aria-hidden />
                     </a>
                   </div>
                 </article>
@@ -246,7 +241,7 @@ export default function Home() {
                   All projects
                 </BtnArrow>
               </div>
-              <ProjectIndex items={SELECTED} />
+              <ProjectIndex items={FEATURED} />
             </div>
           </section>
 
