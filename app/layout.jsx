@@ -1,43 +1,61 @@
+import { Urbanist, Hanken_Grotesk } from 'next/font/google'
 import './globals.css'
-import './styles/horizon-hero.css'
-import './styles/cosmic-theme.css'
-import './styles/hud-button.css'
-import './styles/cosmic-chat.css'
-import ScrollToTop from './components/ScrollToTop'
-import ChatWidget from './components/ChatWidget'
-import SmoothScroll from './components/SmoothScroll'
-import InteractionGuard from './components/InteractionGuard'
+import { ViewTransitions } from 'next-view-transitions'
+import Shell from './components/Shell'
+import Footer from './components/Footer'
+import { COMPANY } from '@/lib/site'
 
-/* viewportFit: 'cover' draws under notches/dynamic islands/status bars on any
-   phone — the safe-area env() paddings in the stylesheets keep UI clear of
-   them. The scale locks disable pinch/double-tap zoom where the meta tag is
-   honored (Android); InteractionGuard covers iOS Safari, which ignores it. */
+const urbanist = Urbanist({ subsets: ['latin'], display: 'swap', variable: '--font-urbanist' })
+const hanken = Hanken_Grotesk({ subsets: ['latin'], display: 'swap', variable: '--font-hanken' })
+
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: 'cover',
+  themeColor: '#e9e8e3',
 }
 
 export const metadata = {
-  title: 'byZenterra — GIS & Spatial Data Infrastructure',
-  description: 'byZenterra is a DTI-registered, Filipino-grown firm advancing GIS and spatial data infrastructure — end-to-end digital mapping solutions serving modern governance and private-sector innovation across the Philippines.',
-  icons: {
-    icon: '/assets/images/logo/byzenterra-icon.svg',
+  metadataBase: new URL(COMPANY.url),
+  title: {
+    default: 'byZenterra | GIS, Data and Web Engineering',
+    template: '%s | byZenterra',
   },
+  description:
+    'byZenterra builds web maps, geospatial analysis, dashboards and web applications for organizations in the Philippines.',
+  openGraph: {
+    type: 'website',
+    siteName: COMPANY.brand,
+    url: COMPANY.url,
+  },
+}
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: COMPANY.brand,
+  legalName: COMPANY.legalName,
+  url: COMPANY.url,
+  email: COMPANY.email,
+  logo: `${COMPANY.url}/assets/images/logo/zenterra-logo-dark.png`,
+  address: { '@type': 'PostalAddress', addressCountry: 'PH' },
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <ViewTransitions>
+    <html lang="en" className={`${urbanist.variable} ${hanken.variable}`}>
       <body>
-        {children}
-        <ScrollToTop />
-        <ChatWidget />
-        <SmoothScroll />
-        <InteractionGuard />
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <Shell>{children}</Shell>
+        <Footer />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
       </body>
     </html>
+    </ViewTransitions>
   )
 }

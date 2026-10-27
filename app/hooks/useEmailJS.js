@@ -43,7 +43,7 @@ export const useEmailJS = () => {
         name: formData.name,
         phone: formData.phone || '',
         email: formData.email,
-        subject: formData.subject || 'Contact from Portfolio',
+        subject: formData.subject || 'Website inquiry',
         message: formData.message
       }
 
