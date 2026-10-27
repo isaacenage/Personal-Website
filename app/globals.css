@@ -497,6 +497,7 @@ a {
   background: radial-gradient(circle at 100% 100%, transparent calc(var(--notch-r) - 0.5px), var(--paper-3) var(--notch-r));
 }
 .notch-links {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -517,6 +518,28 @@ a {
 .notch a[aria-current='page'] {
   background: var(--ink);
   color: var(--on-dark);
+}
+/* The active pill is its own text-free layer anchored under the current
+   label, so a route morph slides the pill and never moves or swaps text. */
+.notch-pill {
+  display: none;
+}
+@supports (anchor-name: --a) {
+  .notch a[aria-current='page'] {
+    anchor-name: --notch-active;
+    background: none;
+  }
+  .notch-pill {
+    display: block;
+    position: absolute;
+    position-anchor: --notch-active;
+    top: anchor(top);
+    left: anchor(left);
+    width: anchor-size(width);
+    height: anchor-size(height);
+    border-radius: var(--r-pill);
+    background: var(--ink);
+  }
 }
 @media (hover: hover) and (pointer: fine) {
   .notch a:not([aria-current='page']):hover {
@@ -1074,6 +1097,9 @@ a {
     display: inline-flex;
     view-transition-name: notch;
   }
+  .notch-pill {
+    view-transition-name: nav-active;
+  }
   .notch-links {
     view-transition-name: notch-links;
   }
@@ -1393,6 +1419,7 @@ a {
 ::view-transition-new(rail-active),
 ::view-transition-old(notch),
 ::view-transition-new(notch),
+::view-transition-old(nav-active),
 ::view-transition-new(nav-active) {
   animation-name: none;
 }
@@ -1403,25 +1430,33 @@ a {
 ::view-transition-new(notch) {
   height: 100%;
 }
-::view-transition-old(notch-links),
-::view-transition-new(notch-links),
 ::view-transition-old(nav-active),
 ::view-transition-new(nav-active) {
+  height: 100%;
+}
+::view-transition-old(notch-links),
+::view-transition-new(notch-links) {
   width: 100%;
   height: 100%;
   object-fit: none;
 }
-::view-transition-group(nav-active) {
+/* labels reveal with the shell's width, never spill past it */
+::view-transition-group(notch-links) {
   overflow: clip;
-  border-radius: var(--r-pill);
-  background: var(--ink);
 }
-::view-transition-old(notch-links),
-::view-transition-old(nav-active) {
-  animation: vt-lift 160ms ease-out;
+/* new section: old labels go at once, new ones are already in place */
+::view-transition-old(notch-links) {
+  display: none;
 }
 ::view-transition-new(notch-links) {
   animation-name: none;
+}
+/* same section: identical labels, only their ink/white swaps as the pill
+   passes, timed to the pill's glide */
+:root[data-nav='left']::view-transition-old(notch-links),
+:root[data-nav='right']::view-transition-old(notch-links) {
+  display: block;
+  animation: vt-lift 300ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 /* full-bleed layers can't scale without exposing edges: the new one sits
    still and the old one lifts off it */

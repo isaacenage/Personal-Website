@@ -33,6 +33,7 @@ export default function Header() {
 
       {pages.length > 0 && (
         <nav className="notch" aria-label={`${section.label} pages`}>
+          <span className="notch-pill" aria-hidden="true" />
           <span className="notch-links">
             {pages.map((p, i) => (
               <Link
@@ -40,7 +41,6 @@ export default function Header() {
                 href={p.href}
                 data-nav={i > at ? 'right' : i < at ? 'left' : undefined}
                 aria-current={route === p.href ? 'page' : undefined}
-                style={route === p.href ? { viewTransitionName: 'nav-active' } : undefined}
               >
                 {p.label}
               </Link>
