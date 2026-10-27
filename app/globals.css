@@ -29,6 +29,9 @@
   --glass-edge: rgb(255 255 255 / 0.75);
   --glass-dark: rgb(9 32 38 / 0.38);
   --glass-dark-edge: rgb(255 255 255 / 0.24);
+  --glass-liquid: rgb(246 245 241 / 0.74);
+  /* the edge light from liquid-glass-react's rim */
+  --lg-rim: 0 0 0 0.5px rgb(255 255 255 / 0.5) inset, 0 1px 3px rgb(255 255 255 / 0.25) inset, 0 1px 4px rgb(0 0 0 / 0.12);
   --glass-shadow: 0 1px 0 rgb(255 255 255 / 0.4) inset, 0 24px 48px -24px rgb(6 28 33 / 0.5);
   --frame-shadow: 0 30px 60px -40px rgb(6 28 33 / 0.5);
   --scrim: rgb(6 24 29 / 0.6);
@@ -459,7 +462,7 @@ a {
 }
 @media (hover: hover) and (pointer: fine) {
   .corner-pill:hover {
-    background: var(--paper-3);
+    background: var(--glass-strong);
   }
 }
 .corner-pill.brand {
@@ -650,7 +653,7 @@ a {
     border-radius: var(--r-pill);
     /* the link discs live in the rail's own background, under the pill;
        one 44px disc per 52px (link + gap) */
-    background-image: radial-gradient(circle at 22px 22px, var(--paper-3) 21.5px, transparent 22px);
+    background-image: radial-gradient(circle at 22px 22px, rgb(255 255 255 / 0.45) 21.5px, transparent 22px);
     background-position: 8px 8px;
     background-size: 44px 52px;
     background-repeat: repeat-y;
@@ -2251,6 +2254,107 @@ a.tile {
   font-size: 0.8125rem;
   padding-top: 24px;
   border-top: 1px solid var(--line);
+}
+
+/* ---------- Liquid glass ----------
+   Every surface is glass; only the notch stays solid. Buttons and active
+   pills are controls, not surfaces, and keep their fill. The featured tier
+   is dark glass.
+   The refraction runs only where there is a photograph behind the glass
+   (the desktop window), and only in Chromium, the one engine that renders
+   SVG filters in backdrop-filter. */
+.corner-pill:not(.corner-pill--cta),
+.mobile-nav summary,
+.mobile-panel,
+.tuck,
+.panel:not(.panel--bare),
+.segmented,
+.tile,
+.steps li,
+.quad > *,
+.tier:not(.tier--featured),
+.card {
+  background-color: var(--glass-liquid);
+}
+.tier--featured {
+  background-color: var(--glass-dark);
+  border-color: var(--glass-dark-edge);
+}
+/* glass inside glass: the outer layer already refracts, so these only tint */
+.service-grid li,
+.tile-note,
+.mobile-sub a:not([aria-current='page']),
+.field input,
+.field select,
+.field textarea {
+  background-color: rgb(255 255 255 / 0.42);
+  box-shadow: var(--lg-rim);
+}
+.glass,
+.glass-dark,
+.corner-pill:not(.corner-pill--cta),
+.mobile-nav summary,
+.mobile-panel,
+.tuck,
+.panel:not(.panel--bare),
+.segmented,
+.tile,
+.steps li,
+.quad > *,
+.tier,
+.card {
+  box-shadow: var(--lg-rim);
+}
+@media (min-width: 1100px) and (min-height: 660px) {
+  .glass,
+  .glass-dark,
+  .corner-pill:not(.corner-pill--cta),
+  .tuck,
+  .panel:not(.panel--bare),
+  .segmented,
+  .tile,
+  .steps li,
+  .quad > *,
+  .tier,
+  .card {
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(12px) saturate(150%);
+    box-shadow: var(--lg-rim), var(--glass-shadow);
+  }
+  /* Chromium only: it alone has neither of these prefixed properties */
+  @supports (not (-webkit-backdrop-filter: none)) and (not (-moz-appearance: none)) {
+    .glass,
+    .glass-dark,
+    .corner-pill:not(.corner-pill--cta),
+    .tuck,
+    .panel:not(.panel--bare),
+    .segmented,
+    .tile,
+    .steps li,
+    .quad > *,
+    .tier,
+    .card {
+      backdrop-filter: blur(6px) url(#liquid-glass) saturate(150%);
+    }
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .corner-pill:not(.corner-pill--cta),
+  .mobile-nav summary,
+  .mobile-panel,
+  .tuck,
+  .panel:not(.panel--bare),
+  .segmented,
+  .tile,
+  .steps li,
+  .quad > *,
+  .tier:not(.tier--featured),
+  .card {
+    background-color: var(--paper-3);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* ---------- Motion ---------- */

@@ -48,6 +48,22 @@ export default function RootLayout({ children }) {
         <a className="skip-link" href="#main">
           Skip to content
         </a>
+        {/* Liquid glass refraction, after rdev/liquid-glass-react (MIT, Max Rovensky).
+            One shared filter; globals.css applies it as a backdrop-filter. */}
+        <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute' }}>
+          <filter id="liquid-glass" colorInterpolationFilters="sRGB">
+            <feImage
+              href="/assets/images/liquid-glass-map.jpg"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              preserveAspectRatio="xMidYMid slice"
+              result="map"
+            />
+            <feDisplacementMap in="SourceGraphic" in2="map" scale="-70" xChannelSelector="R" yChannelSelector="B" />
+          </filter>
+        </svg>
         <Shell>{children}</Shell>
         <Footer />
         <script
