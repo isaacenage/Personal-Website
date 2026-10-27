@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Header from './Header'
 import Rail from './Rail'
@@ -14,6 +15,21 @@ export const photoFor = (pathname) => PHOTOS[ROUTE_PHOTO[routeOf(pathname)]]
 export default function Shell({ children }) {
   const pathname = usePathname()
   const photo = photoFor(pathname)
+
+  // The view transition snapshots the new route at once, so its photo must
+  // already be decoded or the morph lands on an empty frame and stalls.
+  // Desktop only: phones never show the frame photo.
+  useEffect(() => {
+    if (!matchMedia('(min-width: 1100px) and (min-height: 660px)').matches) return
+    const warm = () =>
+      Object.values(PHOTOS).forEach((p) => {
+        const img = new Image()
+        img.src = p.src
+        img.decode().catch(() => {})
+      })
+    if ('requestIdleCallback' in window) requestIdleCallback(warm)
+    else setTimeout(warm, 1500)
+  }, [])
 
   return (
     <div className="frame">

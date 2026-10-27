@@ -1180,6 +1180,10 @@ a {
     grid-area: card;
     max-height: 44vh;
   }
+  .screen--work {
+    grid-template-rows: auto minmax(0, 1fr);
+    row-gap: 32px;
+  }
   .screen--split:not(:has(.vt-card)) .lead-block {
     grid-row: 1 / -1;
   }
@@ -1188,7 +1192,8 @@ a {
   .preview {
     position: relative;
     display: block;
-    height: min(40vh, 340px);
+    height: auto;
+    min-height: 0;
     max-height: none !important;
     border-radius: var(--r-card);
     overflow: hidden;
@@ -1313,12 +1318,12 @@ a {
 
 /* ---------- Route morphs (View Transitions API) ---------- */
 ::view-transition-group(*) {
-  animation-duration: 520ms;
+  animation-duration: 300ms;
   animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
 ::view-transition-old(*),
 ::view-transition-new(*) {
-  animation-duration: 320ms;
+  animation-duration: 200ms;
 }
 ::view-transition-old(page-panel),
 ::view-transition-new(page-panel),
@@ -1332,7 +1337,7 @@ a {
 }
 ::view-transition-old(frame-bg),
 ::view-transition-new(frame-bg) {
-  animation-duration: 600ms;
+  animation-duration: 300ms;
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
