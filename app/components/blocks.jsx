@@ -6,7 +6,7 @@ import { COMPANY, PHOTOS, ROUTE_PHOTO } from '@/lib/site'
    same named parts (lead, panel, card, tuck), so a route change morphs them
    from one layout into the next. */
 
-const KIND = { maps: 'Web map', websites: 'Website', tools: 'Tool' }
+const KIND = { commissions: 'Commission', opensource: 'Open source', dataviz: 'Data viz', side: 'Side project' }
 export const external = (href) =>
   href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {}
 
